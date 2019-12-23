@@ -6,11 +6,9 @@ import sys
 
 from kafka import KafkaProducer
 
-print('Wait for 10 seconds')
-time.sleep(10)
 print('Listen on stdin ...')
 
-producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
+producer = KafkaProducer(bootstrap_servers=['iot.liatti.ch:29092'])
 
 for line in sys.stdin:
     try:

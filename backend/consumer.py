@@ -2,7 +2,7 @@
 
 from kafka import KafkaConsumer
 
-consumer = KafkaConsumer('test', bootstrap_servers=['kafka:9092'])
+consumer = KafkaConsumer('test', bootstrap_servers=['iot.liatti.ch:29092'])
 for message in consumer:
     # message value and key are raw bytes -- decode if necessary!
     # e.g., for unicode: `message.value.decode('utf-8')`
