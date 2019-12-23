@@ -22,4 +22,4 @@ services:
     build: .
     depends_on: 
       - kafka
-    entrypoint: ["./wait-for-it.sh", "kafka:9092", "--timeout=30", "--", "python", "-u", "consumer.py"]
+    entrypoint: ["./wait-for-it.sh", "kafka:9092", "--timeout=0", "--", "python", "-u", "consumer.py"]
