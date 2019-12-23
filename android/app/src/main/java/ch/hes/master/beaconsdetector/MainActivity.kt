@@ -18,18 +18,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var roomTextView: TextView
 
-    private var beaconManager: BeaconManager? = null
-    private var region: BeaconRegion? = null
+    private lateinit var beaconManager: BeaconManager
+    private lateinit var region: BeaconRegion
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
 
         roomTextView = findViewById(R.id.room_text_view)
 
@@ -43,10 +38,11 @@ class MainActivity : AppCompatActivity() {
             17644, null
         )
 
-        beaconManager!!.setRangingListener(BeaconManager.BeaconRangingListener { region, list ->
+        beaconManager.setRangingListener(BeaconManager.BeaconRangingListener { region, list ->
             if (list.isNotEmpty()) {
                 println("region: $region, list: $list")
-                roomTextView.text = list[0].minor.toString()
+                val nearestBeacon = list[0]
+                roomTextView.text = "Room ${nearestBeacon.minor}"
             }
         })
 
@@ -55,12 +51,12 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         SystemRequirementsChecker.checkWithDefaultDialogs(this)
-        beaconManager!!.connect { beaconManager!!.startRanging(region) }
+        beaconManager.connect { beaconManager.startRanging(region) }
     }
 
 
     override fun onPause() {
-        beaconManager!!.stopRanging(region)
+        beaconManager.stopRanging(region)
         super.onPause()
     }
 
