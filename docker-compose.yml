@@ -19,7 +19,19 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   consumer:
-    build: .
-    depends_on: 
+    build: backend
+    depends_on:
       - kafka
     entrypoint: ["./wait-for-it.sh", "kafka:9092", "--timeout=0", "--", "python", "-u", "consumer.py"]
+  db:
+    image: mysql:8.0
+    depends_on:
+      - kafka
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: iot
+      MYSQL_USER: user
+      MYSQL_PASSWORD: iot
+      MYSQL_ROOT_PASSWORD: iot
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
