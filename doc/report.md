@@ -12,6 +12,7 @@ geometry : margin = 2.5cm
 # Introduction
 
 # Analyse et architecture
+<!-- Statistiques -->
 
 # Kafka
 ## Généralités
