@@ -67,7 +67,7 @@ class consumerThread (threading.Thread):
 
 
 if __name__ == "__main__":
-    topic = "test"
+    topic = "knx"
     servers = ['iot.liatti.ch:29092']
     producer = KafkaProducer(bootstrap_servers=servers)
     consumer = KafkaConsumer(topic, bootstrap_servers=servers)
