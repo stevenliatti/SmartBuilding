@@ -6,14 +6,10 @@ from knxnet import *
 
 
 class knx:
-    def __init__(self, group_address, data, data_size, apci):
+    def __init__(self):
         self.gateway_ip = "127.0.0.1"
         self.gateway_port = 3671
         self.endpoint_port = 3672
-        self.group_address = group_address
-        self.data = data
-        self.data_size = data_size
-        self.apici = apci
 
         # -> Socket creation
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -21,7 +17,9 @@ class knx:
         # -> in this example, for the sake of simplicity, the two ports are the same
         # With the simulator, the gateway_ip must be set to 127.0.0.1 and gateway_port to 3671
         self.data_endpoint = (self.gateway_ip, self.endpoint_port)
-        self.control_enpoint = (self.gateway_ip, self.endpoint_port)
+        self.control_endpoint = (self.gateway_ip, self.endpoint_port)
+
+        self.conn_channel_id = self.create_connexion()
 
     def transmit(self, object_frame, message_status):
         self.sock.sendto(object_frame, (self.gateway_ip, self.gateway_port))
@@ -31,11 +29,11 @@ class knx:
         print(conn_resp_object)
         return conn_resp_object
 
-    def creat_connexion(self):
+    def create_connexion(self):
         # -> Sending Connection request
         conn_req_object = knxnet.create_frame(
             knxnet.ServiceTypeDescriptor.CONNECTION_REQUEST,
-            self.control_enpoint,
+            self.control_endpoint,
             self.data_endpoint
         )
         conn_resp_object = self.transmit(conn_req_object.frame, "CONNECTION_RESPONSE")
@@ -47,33 +45,46 @@ class knx:
         conn_state_request_object = knxnet.create_frame(
             knxnet.ServiceTypeDescriptor.CONNECTION_STATE_REQUEST,
             conn_channel_id,
-            self.control_enpoint
+            self.control_endpoint
         )
         conn_resp_object = self.transmit(conn_state_request_object.frame, "CONNECTION_STATE_RESPONSE")
         return conn_channel_id
 
-    def send_datas(self, conn_channel_id):
+    def send_datas(self, group_address, data, data_size, apci, read=False):
         # Send tunelling ack
         tunnelling_request_obj = knxnet.create_frame(
             knxnet.ServiceTypeDescriptor.TUNNELLING_REQUEST,
             knxnet.GroupAddress.from_str(group_address),
-            conn_channel_id,
-            self.data,
-            self.data_size,
-            self.apci
+            self.conn_channel_id,
+            data,
+            data_size,
+            apci
         )
         # Receive tunelling ack and request from gateway
         conn_resp_object = self.transmit(tunnelling_request_obj.frame, "TUNNELLING_ACK")
         conn_resp_object = self.transmit(tunnelling_request_obj.frame, "TUNNELLING_REQUEST")
+
+        if read:
+            tunnelling_request_obj = knxnet.create_frame(
+                knxnet.ServiceTypeDescriptor.TUNELLING_ACK,
+                knxnet.GroupAddress.from_str(group_address),
+                self.conn_channel_id,
+                data,
+                data_size,
+                apci
+            )
+            # Receive tunelling ack and request from gateway
+            conn_resp_object = self.transmit(tunnelling_request_obj.frame, "TUNNELLING_REQUEST")
+
         return conn_resp_object
 
 
-    def disconnect(self, conn_channel_id):
+    def disconnect(self):
         # Send disconnect request
         disconnect_req_obj = knxnet.create_frame(
             knxnet.ServiceTypeDescriptor.DISCONNECT_REQUEST,
-            conn_channel_id,
-            self.control_enpoint
+            self.conn_channel_id,
+            self.control_endpoint
         )
         conn_resp_object = self.transmit(disconnect_req_obj.frame, "DISCONNECT_RESPONSE")
 
@@ -96,6 +107,6 @@ if __name__ == "__main__":
     apci = int(sys.argv[4])
 
     knx = knx(group_address, data, data_size, apci)
-    conn_channel_id = knx.creat_connexion()
+    conn_channel_id = knx.create_connexion()
     knx.send_datas(conn_channel_id)
     knx.disconnect(conn_channel_id)

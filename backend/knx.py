@@ -4,8 +4,9 @@ from kafka import KafkaProducer
 from kafka import KafkaConsumer
 import time
 import sys
+import json
 
-from backend import knx_lib
+import knx_lib
 
 
 class producerThread (threading.Thread):
@@ -17,13 +18,16 @@ class producerThread (threading.Thread):
     def run(self):
         for line in sys.stdin:
             try:
-                producer.send(topic, str.encode(line.rstrip()))
+                producer.send(topic, key=b'percentage_blinds', value=str.encode(line.rstrip()))
             except:
                 print('error with producer')
         return
 
 class consumerThread (threading.Thread):
     XBLINDS = 1
+    XBLINDSPERCENT = 3
+    XBLINDSREAD = 4
+    XRADIATOR = 0
     FLOOR = 4
     BLOC = 1
     def __init__(self, consumer):
@@ -37,49 +41,42 @@ class consumerThread (threading.Thread):
             print('error with producer')
 
     def run(self):
+        knx = knx_lib.knx()
         for message in self.consumer:
             print("%s:%d:%d: key=%s value=%s" %
                   (message.topic, message.partition, message.offset, message.key, message.value))
-            if message.key == "open_blinds":
+            if message.key.decode("utf-8") == "open_blinds":
+                print("Fewrfewrewrojewr")
                 group_address = str(self.XBLINDS)+"/"+ str(self.FLOOR)+"/"+ str(self.BLOC)
-                knx = knx(group_address, "data", 1, 2)
-                conn_channel_id = knx.creat_connexion()
-                knx.send_datas(conn_channel_id)
-                knx.disconnect(conn_channel_id)
+                knx.send_datas(group_address, 0, 1, 2)
 
-            elif message.key == "close_blinds":
+
+            elif message.key.decode("utf-8") == "close_blinds":
                 group_address = str(self.XBLINDS) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
-                knx = knx(group_address, "data", 1, 2)
-                conn_channel_id = knx.creat_connexion()
-                knx.send_datas(conn_channel_id)
-                knx.disconnect(conn_channel_id)
-            elif message.key == "pourcentage_blinds":
-                content = message.value.get_json()
+                knx.config(group_address, 1, 1, 2)
+            elif message.key.decode("utf-8") == "percentage_blinds":
+                content = json.loads(message.value.decode("utf-8"))
                 if all(item in content.keys() for item in ['percentage']):
-                    group_address = str(self.XBLINDS) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
-                    knx = knx(group_address, int(content['percentage']), 1, 2)
-                    conn_channel_id = knx.creat_connexion()
-                    knx.send_datas(conn_channel_id)
-                    knx.disconnect(conn_channel_id)
+                    percent = int(content['percentage'] * 255 / 100)
+                    group_address = str(self.XBLINDSPERCENT) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
+                    knx.send_datas(group_address, percent, 2, 2)
                 else:
                     print("Error key")
-            elif message.key == "read_blinds":
-                group_address = str(self.XBLINDS) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
-                knx = knx(group_address, "data", 1, 2)
-                conn_channel_id = knx.creat_connexion()
-                res = knx.send_datas(conn_channel_id)
-                knx.disconnect(conn_channel_id)
-                self.produce(res) # Produce the message contain the status of blinds
-            elif message.key == "pourcentage_radiator":
-                content = message.value.get_json()
+            elif message.key.decode("utf-8") == "read_blinds":
+                group_address = str(self.XBLINDSREAD) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
+                knx.send_datas(group_address, 0, 1, 0, True)
+
+                #self.produce(res) # Produce the message contain the status of blinds
+            elif message.key.decode("utf-8") == "pourcentage_radiator":
+                content = json.loads(message.value.decode("utf-8"))
                 if all(item in content.keys() for item in ['percentage']):
-                    group_address = str(self.XBLINDS) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
-                    knx = knx(group_address, int(content['percentage']), 1, 2)
-                    conn_channel_id = knx.creat_connexion()
-                    knx.send_datas(conn_channel_id)
-                    knx.disconnect(conn_channel_id)
+                    group_address = str(self.XRADIATOR) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
+                    percent = int(content['percentage'] * 255 / 100)
+                    knx.send_datas(group_address, percent, 2, 2)
                 else:
                     print("Error key")
+        knx.disconnect()
+
 
 
 if __name__ == "__main__":
