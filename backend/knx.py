@@ -23,7 +23,7 @@ class producerThread (threading.Thread):
     def run(self):
         knx = knx_lib.knx()
         while True:
-            group_address = str(self.XBLINDSREAD) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)  # Read the state of blinds
+            group_address = str(XBLINDSREAD) + "/" + str(FLOOR) + "/" + str(BLOC)  # Read the state of blinds
             res = knx.send_datas(group_address, 0, 1, 0, True)
             producer.send(topic, key=b'percentage_blinds', value=str.encode(res)) # Produce the message contain the status of blinds
             time.sleep(20)
