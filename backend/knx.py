@@ -3,11 +3,16 @@ import threading
 from kafka import KafkaProducer
 from kafka import KafkaConsumer
 import time
-import sys
 import json
 
 import knx_lib
 
+XBLINDS = 1
+XBLINDSPERCENT = 3
+XBLINDSREAD = 4
+XRADIATOR = 0
+FLOOR = 4
+BLOC = 1
 
 class producerThread (threading.Thread):
     def __init__(self, producer, topic):
@@ -16,29 +21,17 @@ class producerThread (threading.Thread):
         self.topic = topic
 
     def run(self):
-        for line in sys.stdin:
-            try:
-                producer.send(topic, key=b'percentage_blinds', value=str.encode(line.rstrip()))
-            except:
-                print('error with producer')
-        return
+        knx = knx_lib.knx()
+        while True:
+            group_address = str(self.XBLINDSREAD) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)  # Read the state of blinds
+            res = knx.send_datas(group_address, 0, 1, 0, True)
+            producer.send(topic, key=b'percentage_blinds', value=str.encode(res)) # Produce the message contain the status of blinds
+            time.sleep(20)
 
 class consumerThread (threading.Thread):
-    XBLINDS = 1
-    XBLINDSPERCENT = 3
-    XBLINDSREAD = 4
-    XRADIATOR = 0
-    FLOOR = 4
-    BLOC = 1
     def __init__(self, consumer):
         threading.Thread.__init__(self)
         self.consumer = consumer
-
-    def produce(self, message):
-        try:
-            producer.send(topic, str.encode(message))
-        except:
-            print('error with producer')
 
     def run(self):
         knx = knx_lib.knx()
@@ -47,30 +40,24 @@ class consumerThread (threading.Thread):
                   (message.topic, message.partition, message.offset, message.key, message.value))
             if message.key.decode("utf-8") == "open_blinds":
                 print("Fewrfewrewrojewr")
-                group_address = str(self.XBLINDS)+"/"+ str(self.FLOOR)+"/"+ str(self.BLOC)
+                group_address = str(XBLINDS)+"/"+ str(FLOOR)+"/"+ str(BLOC)
                 knx.send_datas(group_address, 0, 1, 2)
 
-
             elif message.key.decode("utf-8") == "close_blinds":
-                group_address = str(self.XBLINDS) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
+                group_address = str(XBLINDS) + "/" + str(FLOOR) + "/" + str(BLOC)
                 knx.config(group_address, 1, 1, 2)
             elif message.key.decode("utf-8") == "percentage_blinds":
                 content = json.loads(message.value.decode("utf-8"))
                 if all(item in content.keys() for item in ['percentage']):
                     percent = int(content['percentage'] * 255 / 100)
-                    group_address = str(self.XBLINDSPERCENT) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
+                    group_address = str(XBLINDSPERCENT) + "/" + str(FLOOR) + "/" + str(BLOC)
                     knx.send_datas(group_address, percent, 2, 2)
                 else:
                     print("Error key")
-            elif message.key.decode("utf-8") == "read_blinds":
-                group_address = str(self.XBLINDSREAD) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
-                knx.send_datas(group_address, 0, 1, 0, True)
-
-                #self.produce(res) # Produce the message contain the status of blinds
             elif message.key.decode("utf-8") == "pourcentage_radiator":
                 content = json.loads(message.value.decode("utf-8"))
                 if all(item in content.keys() for item in ['percentage']):
-                    group_address = str(self.XRADIATOR) + "/" + str(self.FLOOR) + "/" + str(self.BLOC)
+                    group_address = str(XRADIATOR) + "/" + str(FLOOR) + "/" + str(BLOC)
                     percent = int(content['percentage'] * 255 / 100)
                     knx.send_datas(group_address, percent, 2, 2)
                 else:
