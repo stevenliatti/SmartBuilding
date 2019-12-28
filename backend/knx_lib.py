@@ -21,11 +21,11 @@ class knx:
 
         self.conn_channel_id = self.create_connexion()
 
-    def transmit(self, object_frame, message_status):
+    def transmit(self, object_frame):
         self.sock.sendto(object_frame, (self.gateway_ip, self.gateway_port))
         data_recv, addr = self.sock.recvfrom(1024)
         conn_resp_object = knxnet.decode_frame(data_recv)
-        print(message_status)
+        print(type(conn_resp_object))
         print(conn_resp_object)
         return conn_resp_object
 
@@ -36,7 +36,7 @@ class knx:
             self.control_endpoint,
             self.data_endpoint
         )
-        conn_resp_object = self.transmit(conn_req_object.frame, "CONNECTION_RESPONSE")
+        conn_resp_object = self.transmit(conn_req_object.frame)
 
         # <- Retrieving channel_id from Connection response
         conn_channel_id = conn_resp_object.channel_id
@@ -47,11 +47,11 @@ class knx:
             conn_channel_id,
             self.control_endpoint
         )
-        conn_resp_object = self.transmit(conn_state_request_object.frame, "CONNECTION_STATE_RESPONSE")
+        conn_resp_object = self.transmit(conn_state_request_object.frame)
         return conn_channel_id
 
     def send_datas(self, group_address, data, data_size, apci, read=False):
-        # Send tunelling ack
+        # Send tunelling request
         tunnelling_request_obj = knxnet.create_frame(
             knxnet.ServiceTypeDescriptor.TUNNELLING_REQUEST,
             knxnet.GroupAddress.from_str(group_address),
@@ -60,21 +60,30 @@ class knx:
             data_size,
             apci
         )
-        # Receive tunelling ack and request from gateway
-        conn_resp_object = self.transmit(tunnelling_request_obj.frame, "TUNNELLING_ACK")
-        conn_resp_object = self.transmit(tunnelling_request_obj.frame, "TUNNELLING_REQUEST")
+        # Receive tunelling ack
+        conn_resp_object = self.transmit(tunnelling_request_obj.frame)
+        # Receive tunelling request
+        conn_resp_object = self.transmit(tunnelling_request_obj.frame)
 
         if read:
             tunnelling_request_obj = knxnet.create_frame(
-                knxnet.ServiceTypeDescriptor.TUNELLING_ACK,
-                knxnet.GroupAddress.from_str(group_address),
+                knxnet.ServiceTypeDescriptor.TUNNELLING_ACK,
                 self.conn_channel_id,
-                data,
-                data_size,
-                apci
+                0
             )
-            # Receive tunelling ack and request from gateway
-            conn_resp_object = self.transmit(tunnelling_request_obj.frame, "TUNNELLING_REQUEST")
+            # Receive tunelling ack, NOT IN THE SHEMA
+            conn_resp_object = self.transmit(tunnelling_request_obj.frame)
+            # Receive tunelling request, NOT IN THE SHEMA
+            conn_resp_object = self.transmit(tunnelling_request_obj.frame)
+
+            # Receive tunelling request, with the true data
+            conn_resp_object = self.transmit(tunnelling_request_obj.frame)
+
+        # Because protocol not designed for this scenario,
+        # we have to read the socket again to emtpy him
+        else:
+            data_recv, addr = self.sock.recvfrom(1024)
+            data_recv, addr = self.sock.recvfrom(1024)
 
         return conn_resp_object
 
@@ -86,7 +95,7 @@ class knx:
             self.conn_channel_id,
             self.control_endpoint
         )
-        conn_resp_object = self.transmit(disconnect_req_obj.frame, "DISCONNECT_RESPONSE")
+        conn_resp_object = self.transmit(disconnect_req_obj.frame)
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
