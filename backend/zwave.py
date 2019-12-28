@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
+#! /usr/bin/env python
 import threading
 from kafka import KafkaProducer
 from kafka import KafkaConsumer
 import json
+import time
 
 from zwave_lib import Backend_with_dimmers_and_sensors
 
@@ -15,7 +16,7 @@ class producerThread (threading.Thread):
 
     def run(self):
         for i in range(0, 10):
-            producer.send(topic, str.encode("test"+str(i)))
+            producer.send(topic, key="", value=str.encode("test"+str(i)))
 
 class consumerThread (threading.Thread):
     def __init__(self, consumer, producer, topic):
@@ -36,7 +37,7 @@ class consumerThread (threading.Thread):
             print("%s:%d:%d: key=%s value=%s" %
                   (message.topic, message.partition, message.offset, message.key, message.value))
 
-            if message.key.decode("utf-8")== "network_info":
+            if message.key.decode("utf-8") == "network_info":
                 self.produce(self.backend.network_info())
             elif message.key.decode("utf-8") == "network_set_sensor_nodes_basic_configuration":
                 content = json.loads(message.value)
@@ -44,7 +45,8 @@ class consumerThread (threading.Thread):
                     Grp_interval = int(content['Group_Interval'])
                     Grp_reports = int(content['Group_Reports'])
                     Wakeup_interval = int(content['Wake-up_Interval'])
-                    self.produce(self.backend.set_basic_sensor_nodes_configuration(Grp_interval, Grp_reports, Wakeup_interval))
+                    self.produce(
+                        self.backend.set_basic_sensor_nodes_configuration(Grp_interval, Grp_reports, Wakeup_interval))
                 else:
                     print('wrong input')
             elif message.key.decode("utf-8") == "network_get_nodes_configuration":
@@ -60,7 +62,7 @@ class consumerThread (threading.Thread):
             elif message.key.decode("utf-8") == "nodes_add_node":
                 self.produce(self.backend.addNode())  # passes controller to inclusion mode
             elif message.key.decode("utf-8") == "nodes_remove_node":
-                self.produce(self.backend.removeNode()) # passes controller to exclusion mode
+                self.produce(self.backend.removeNode())  # passes controller to exclusion mode
             elif message.key.decode("utf-8") == "nodes_set_parameter":
                 content = json.loads(message.value)
                 if all(item in content.keys() for item in ['node_id', 'parameter_index', 'value', 'size']):
@@ -167,7 +169,10 @@ if __name__ == "__main__":
     servers = 'iot.liatti.ch:29092'
     producer = KafkaProducer(bootstrap_servers='iot.liatti.ch:29092')
     consumer = KafkaConsumer(topic, bootstrap_servers='iot.liatti.ch:29092')
+    time.sleep(5)
     p = producerThread(producer, topic)
     c = consumerThread(consumer, producer, topic)
-    p.start()
     c.start()
+    time.sleep(2)
+    p.start()
+    time.sleep(2)
