@@ -2,23 +2,114 @@
 
 ## Commands
 
-- GET, "/open_blinds", params_url: { uuid: string, major: int, minor: int }
-- GET, "/close_blinds", params_url: { uuid: string, major: int, minor: int }
-- GET, "/percentage_blinds", params_url: { uuid: string, major: int, minor: int, percentage: int }
-- GET, "/percentage_radiator", params_url: { uuid: string, major: int, minor: int, percentage: int }
+
+### open_blinds
+
+- Method: GET
+- Endpoint: "/open_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+### close_blinds
+
+- Method: GET
+- Endpoint: "/close_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+### percentage_blinds
+
+- Method: GET
+- Endpoint: "/percentage_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+    - percentage: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+### percentage_radiator
+
+- Method: GET
+- Endpoint: "/percentage_radiator"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+    - percentage: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
 
 ## Infos
 
-- GET, "/read_percentage_blinds", params_url: { uuid: string, major: int, minor: int }
+
+### read_percentage_blinds
+
+- Method: GET
+- Endpoint: "/read_percentage_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true, percentage: 42 }`
+- Error: `{ success: false }`
+
 
 
 # OpenZWave
 
 ## Commands
 
-- GET, "/percentage_dimmers", params_url: { uuid: string, major: int, minor: int, percentage: int }
+
+### percentage_dimmers
+
+- Method: GET
+- Endpoint: "/percentage_dimmers"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+    - percentage: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
 
 ## Infos
 
-- GET, "/get_network_info", params_url: { uuid: string, major: int, minor: int }
-- GET, "/get_nodes_list", params_url: { uuid: string, major: int, minor: int }
+
+### get_network_info
+
+- Method: GET
+- Endpoint: "/get_network_info"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true, info: ... }`
+- Error: `{ success: false }`
+
+
+### get_nodes_list
+
+- Method: GET
+- Endpoint: "/get_nodes_list"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true, info: ... }`
+- Error: `{ success: false }`
+
