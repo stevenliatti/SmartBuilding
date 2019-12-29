@@ -49,7 +49,7 @@ def open_blinds():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             producer.send(KNX_TOPIC, key=b'open_blinds')
             return { "success": True }
-        return { "success": False }
+    return { "success": False }
 
 
 @app.route('/close_blinds', strict_slashes=False)
@@ -59,7 +59,7 @@ def close_blinds():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             producer.send(KNX_TOPIC, key=b'close_blinds')
             return { "success": True }
-        return { "success": False }
+    return { "success": False }
 
 
 @app.route('/percentage_blinds', strict_slashes=False)
@@ -70,7 +70,7 @@ def percentage_blinds():
             percentage = content.get('percentage')
             producer.send(KNX_TOPIC, key=b'percentage_blinds', value=str.encode('{"percentage":' + percentage + '}'))
             return { "success": True }
-        return { "success": False }
+    return { "success": False }
 
 @app.route('/percentage_radiator', strict_slashes=False)
 def percentage_radiator():
@@ -80,7 +80,7 @@ def percentage_radiator():
             percentage = content.get('percentage')
             producer.send(KNX_TOPIC, key=b'percentage_radiator', value=str.encode('{"percentage":' + percentage + '}'))
             return { "success": True }
-        return { "success": False }
+    return { "success": False }
 
 @app.route('/read_percentage_blinds', strict_slashes=False)
 def read_percentage_blinds():
@@ -89,7 +89,7 @@ def read_percentage_blinds():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             # DEVICEID = TROUVE EN FAISANT QUERY SQL
             return devicesInfos.get('DEVICEID')
-        return { "success": False }
+    return { "success": False }
 
 ########################## END KNX ROUTES ########################################################################
 
@@ -102,7 +102,7 @@ def percentage_dimmers():
             percentage = content.get('percentage')
             producer.send(OPENZWAVE_TOPIC, key=b'dimmers_set_level', value=str.encode('{"percentage":' + percentage + '}'))
             return { "success": True }
-        return { "success": False }
+    return { "success": False }
 
 @app.route('/get_network_info', strict_slashes=False)
 def get_network_info():
@@ -111,7 +111,7 @@ def get_network_info():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             # KEYFORNODEKEYFORNETWORKINFOSLISTE = TROUVE EN FAISANT QUERY SQL
             return devicesInfos.get('KEYFORNETWORKINFOS')
-        return { "success": False }
+    return { "success": False }
 
 @app.route('/get_nodes_list', strict_slashes=False)
 def get_nodes_list():
@@ -120,7 +120,7 @@ def get_nodes_list():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             # KEYFORNODELISTE = TROUVE EN FAISANT QUERY SQL
             return devicesInfos.get('KEYFORNODELISTE')
-        return { "success": False }
+    return { "success": False }
 
 
 ########################## END OPENZWAVE ROUTES ##################################################################
