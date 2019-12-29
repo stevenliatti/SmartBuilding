@@ -205,65 +205,12 @@ class Backend():
     ############# NODES #################################################################################################
     #######################################################################################################################
 
-    def ordered_nodes_dict(self):
-
-        # returns an ordered list of the network's nodes sorted by node's id
-
-        return OrderedDict(sorted(self.network.nodes.items()))
-
-    def addNode(self):
-        if self.network.controller.add_node():
-            print("Devices can be added")
-            time.sleep(20)
-            print("End of inclusion mode")
-            self.network.controller.cancel_command()
-            return jsonify({"Message": "Node added with success"})
-        else:
-            return jsonify({"Message": "Node not added"})
-
-    def removeNode(self):
-        if self.network.controller.remove_node():
-            print("Devices can be removed")
-            time.sleep(20)
-            print("End of exclusion mode")
-            self.network.controller.cancel_command()
-            return jsonify({"Message": "Node removed with success"})
-        else:
-            return jsonify({"Message": "Node not removed"})
-
     def get_nodes_list(self):
         names = {}
         for node in self.network.nodes.values():
             names[node.node_id] = node.product_name
             print(node.product_name)
         return jsonify(names)
-
-    def set_node_location(self, n, value):
-        self.network.nodes[n].set_field("location", value)
-        return jsonify({n: value})
-
-    def set_node_name(self, n, value):
-        self.network.nodes[n].set_field("name", value)
-        return jsonify({n: value})
-
-    def get_node_location(self, n):
-        return jsonify({"location": self.network.nodes[n].location})
-
-    def get_node_name(self, n):
-        return jsonify({"name": self.network.nodes[n].name})
-
-    def get_neighbours_list(self, n):
-        print(self.network.nodes[n].neighbors)
-        return jsonify({"neighbors": list(self.network.nodes[n].neighbors)})
-
-    def set_node_config_parameter(self, n, param, value, size):
-        self.network.nodes[n].set_config_param(param, value, size)
-        return jsonify({"new value": value})
-
-    # Need asyncio, but doesn't install on raspberry
-    # @asyncio.coroutine
-    def get_node_config_parameter(self, n, param):
-        return jsonify({"parameter": self.network.nodes[n].request_config_param(param)})
 
     def get_nodes_Configuration(self):
         # No mention of configuration in the doc
@@ -387,9 +334,7 @@ class Backend_with_dimmers(Backend):
         return jsonify(map)
 
     def get_dimmer_level(self, n):
-
-        #### COMPLETE THIS METHOD ##############
-
+        self.get_dimmer_level()
         return "this method gets a dimmer's brightness level of a specific node"
 
     def set_dimmer_level(self, n, level):
