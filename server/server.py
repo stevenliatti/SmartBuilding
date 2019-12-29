@@ -28,6 +28,7 @@ consumerZWAVE = KafkaConsumer(OPENZWAVE_TOPIC, bootstrap_servers=servers)
 
 try:
     cnx = mysql.connector.connect(user='root', password='iot', host='db', database='iot')
+    cursor = cnx.cursor()
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         ("Something is wrong with your user name or password")
@@ -47,6 +48,17 @@ def open_blinds():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            query = ("SELECT number, floor, type "
+                "FROM Room JOIN Beacon ON Beacon.room_number = Room.number "
+                "JOIN Knx_device ON Room.number = Knx_device.room_number "
+                "WHERE minor = {};".format(content.get('minor')))
+            print(query)
+
+            # TODO: marche pas
+            # cursor.execute(query)
+            # for bob in cursor:
+                # print("{}".format(bob))
+
             producer.send(KNX_TOPIC, key=b'open_blinds')
             return { "success": True }
     return { "success": False }

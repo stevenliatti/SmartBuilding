@@ -42,4 +42,4 @@ services:
     depends_on:
       - kafka
       - db
-    entrypoint: ["./wait-for-it.sh", "db:33060", "--timeout=0", "--", "python", "-u", "server.py"]
+    entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=0", "--", "python", "-u", "server.py"]
