@@ -93,9 +93,9 @@ class consumerThread (threading.Thread):
                         self.produce(self.backend.get_dimmer_level(node_id))
                 elif message.key.decode("utf-8") == "dimmers_set_level":
                     content = json.loads(message.value)
-                    if all(item in content.keys() for item in ['node_id', 'value']):
+                    if all(item in content.keys() for item in ['node_id', 'percentage']):
                         node = int(content['node_id'])
-                        value = int(content['value'])
+                        value = int(content['percentage'])
                         if 99 < value:
                             value = 99
                         elif value < 0:
