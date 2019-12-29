@@ -14,6 +14,9 @@ sys.path.insert(0, file_path)
 
 from flask import Flask, render_template, jsonify, Response, request
 
+import mysql.connector
+from mysql.connector import errorcode
+
 app = Flask(__name__)
 
 servers = ['iot.liatti.ch:29092']
@@ -22,6 +25,18 @@ OPENZWAVE_TOPIC = "zwave"
 producer = KafkaProducer(bootstrap_servers=servers)
 consumerKNX = KafkaConsumer(KNX_TOPIC, bootstrap_servers=servers)
 consumerZWAVE = KafkaConsumer(OPENZWAVE_TOPIC, bootstrap_servers=servers)
+
+try:
+    cnx = mysql.connector.connect(user='root', password='iot', host='db', database='iot')
+except mysql.connector.Error as err:
+    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+        ("Something is wrong with your user name or password")
+    elif err.errno == errorcode.ER_BAD_DB_ERROR:
+        ("Database does not exist")
+    else:
+        (err)
+else:
+    cnx.close()
 
 devicesInfos = {}
 
@@ -33,10 +48,8 @@ def open_blinds():
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             producer.send(KNX_TOPIC, key=b'open_blinds')
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+            return { "success": True }
+        return { "success": False }
 
 
 @app.route('/close_blinds', strict_slashes=False)
@@ -45,10 +58,8 @@ def close_blinds():
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             producer.send(KNX_TOPIC, key=b'close_blinds')
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+            return { "success": True }
+        return { "success": False }
 
 
 @app.route('/percentage_blinds', strict_slashes=False)
@@ -58,10 +69,8 @@ def percentage_blinds():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             percentage = content.get('percentage')
             producer.send(KNX_TOPIC, key=b'percentage_blinds', value=str.encode('{"percentage":' + percentage + '}'))
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+            return { "success": True }
+        return { "success": False }
 
 @app.route('/percentage_radiator', strict_slashes=False)
 def percentage_radiator():
@@ -70,10 +79,8 @@ def percentage_radiator():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             percentage = content.get('percentage')
             producer.send(KNX_TOPIC, key=b'percentage_radiator', value=str.encode('{"percentage":' + percentage + '}'))
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+            return { "success": True }
+        return { "success": False }
 
 @app.route('/read_percentage_blinds', strict_slashes=False)
 def read_percentage_blinds():
@@ -82,10 +89,7 @@ def read_percentage_blinds():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             # DEVICEID = TROUVE EN FAISANT QUERY SQL
             return devicesInfos.get('DEVICEID')
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+        return { "success": False }
 
 ########################## END KNX ROUTES ########################################################################
 
@@ -97,10 +101,8 @@ def percentage_dimmers():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             percentage = content.get('percentage')
             producer.send(OPENZWAVE_TOPIC, key=b'dimmers_set_level', value=str.encode('{"percentage":' + percentage + '}'))
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+            return { "success": True }
+        return { "success": False }
 
 @app.route('/get_network_info', strict_slashes=False)
 def get_network_info():
@@ -109,10 +111,7 @@ def get_network_info():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             # KEYFORNODEKEYFORNETWORKINFOSLISTE = TROUVE EN FAISANT QUERY SQL
             return devicesInfos.get('KEYFORNETWORKINFOS')
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+        return { "success": False }
 
 @app.route('/get_nodes_list', strict_slashes=False)
 def get_nodes_list():
@@ -121,10 +120,7 @@ def get_nodes_list():
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
             # KEYFORNODELISTE = TROUVE EN FAISANT QUERY SQL
             return devicesInfos.get('KEYFORNODELISTE')
-        else:
-            return "Missing params"
-    else:
-        return "Incorrect params"
+        return { "success": False }
 
 
 ########################## END OPENZWAVE ROUTES ##################################################################
@@ -167,4 +163,5 @@ if __name__ == '__main__':
         consumerThreadZWAVE.start()
 
     except KeyboardInterrupt:
+        cnx.close()
         exit(0)
