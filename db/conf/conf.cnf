@@ -1,0 +1,4 @@
+[mysqld]
+skip-host-cache
+skip-name-resolve
+max_allowed_packet=64M

@@ -13,11 +13,15 @@ file_path = os.path.dirname(__file__)
 sys.path.insert(0, file_path)
 
 from flask import Flask, render_template, jsonify, Response, request
-
-import mysql.connector
-from mysql.connector import errorcode
+from flask_mysqldb import MySQL
 
 app = Flask(__name__)
+app.config['MYSQL_USER'] = 'user'
+app.config['MYSQL_PASSWORD'] = 'iot'
+app.config['MYSQL_DB'] = 'iot'
+app.config['MYSQL_HOST'] = 'db'
+mysql = MySQL(app)
+# mysql.init_app(app)
 
 servers = ['iot.liatti.ch:29092']
 KNX_TOPIC = "knx"
@@ -26,20 +30,27 @@ producer = KafkaProducer(bootstrap_servers=servers)
 consumerKNX = KafkaConsumer(KNX_TOPIC, bootstrap_servers=servers)
 consumerZWAVE = KafkaConsumer(OPENZWAVE_TOPIC, bootstrap_servers=servers)
 
-try:
-    cnx = mysql.connector.connect(user='root', password='iot', host='db', database='iot')
-    cursor = cnx.cursor()
-except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        ("Something is wrong with your user name or password")
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        ("Database does not exist")
-    else:
-        (err)
-else:
-    cnx.close()
-
 devicesInfos = {}
+
+def manage_blinds(minor, kind, key, percentage=-1):
+    query = ("SELECT number, floor "
+        "FROM Room JOIN Beacon ON Beacon.room_number = Room.number "
+        "JOIN Knx_device ON Room.number = Knx_device.room_number "
+        "WHERE minor = {} AND type = \"{}\";".format(minor, kind))
+    
+    print(query)
+    cursor = mysql.connection.cursor()
+    cursor.execute(query)
+    room, floor = cursor.fetchone()
+    cursor.close()
+
+    if percentage != -1:
+        kafka_message = '{ "room": ' + str(room) + ', "floor": ' + str(floor) + ', "percentage": ' + str(percentage) + ' }'
+    else:
+        kafka_message = '{ "room": ' + str(room) + ', "floor": ' + str(floor) + ' }'
+
+    print(kafka_message)
+    producer.send(KNX_TOPIC, key=str.encode(key), value=str.encode(kafka_message))
 
 ########################## KNX ROUTES ########################################################################
 
@@ -48,18 +59,7 @@ def open_blinds():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            query = ("SELECT number, floor, type "
-                "FROM Room JOIN Beacon ON Beacon.room_number = Room.number "
-                "JOIN Knx_device ON Room.number = Knx_device.room_number "
-                "WHERE minor = {};".format(content.get('minor')))
-            print(query)
-
-            # TODO: marche pas
-            # cursor.execute(query)
-            # for bob in cursor:
-                # print("{}".format(bob))
-
-            producer.send(KNX_TOPIC, key=b'open_blinds')
+            manage_blinds(content.get('minor'), 'blind', 'open_blinds')
             return { "success": True }
     return { "success": False }
 
@@ -69,7 +69,7 @@ def close_blinds():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            producer.send(KNX_TOPIC, key=b'close_blinds')
+            manage_blinds(content.get('minor'), 'blind', 'close_blinds')
             return { "success": True }
     return { "success": False }
 
@@ -80,7 +80,7 @@ def percentage_blinds():
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             percentage = content.get('percentage')
-            producer.send(KNX_TOPIC, key=b'percentage_blinds', value=str.encode('{"percentage":' + percentage + '}'))
+            manage_blinds(content.get('minor'), 'blind', 'percentage_blinds', percentage)
             return { "success": True }
     return { "success": False }
 
@@ -90,7 +90,7 @@ def percentage_radiator():
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             percentage = content.get('percentage')
-            producer.send(KNX_TOPIC, key=b'percentage_radiator', value=str.encode('{"percentage":' + percentage + '}'))
+            manage_blinds(content.get('minor'), 'radiator', 'percentage_radiator', percentage)
             return { "success": True }
     return { "success": False }
 
@@ -175,5 +175,4 @@ if __name__ == '__main__':
         consumerThreadZWAVE.start()
 
     except KeyboardInterrupt:
-        cnx.close()
         exit(0)

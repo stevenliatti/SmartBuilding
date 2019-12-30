@@ -25,6 +25,8 @@ services:
     entrypoint: ["./wait-for-it.sh", "kafka:9092", "--timeout=0", "--", "python", "-u", "consumer.py"]
   db:
     image: mysql:8.0
+    ports:
+      - 3306:3306
     depends_on:
       - kafka
     command: --default-authentication-plugin=mysql_native_password
@@ -34,7 +36,8 @@ services:
       MYSQL_PASSWORD: iot
       MYSQL_ROOT_PASSWORD: iot
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
+      - ./db/dump:/docker-entrypoint-initdb.d
+      - ./db/conf:/etc/mysql/conf.d
   server:
     build: server
     ports:

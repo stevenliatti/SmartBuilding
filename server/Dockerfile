@@ -2,8 +2,10 @@ FROM python:latest
 
 WORKDIR /app
 RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && chmod +x wait-for-it.sh
-RUN pip install kafka-python flask mysql-connector-python
+RUN pip install kafka-python
+RUN pip install flask
+RUN pip install flask-mysqldb
 
-COPY server.py server.py
+COPY *.py ./
 
 ENTRYPOINT [ "python", "server.py" ]
