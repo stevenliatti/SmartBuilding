@@ -36,33 +36,50 @@ class consumerThread (threading.Thread):
         threading.Thread.__init__(self)
         self.consumer = consumer
 
+    def decode_knx_infos(self, value):
+        content = json.loads(value)
+        if all(item in content.keys() for item in ['room', 'floor']):
+            bloc = content['room']
+            floor = content['floor']
+            if all(item in content.keys() for item in ['percentage']):
+                percent = int(content['percentage'] * 255 / 100)
+                return bloc, floor, percent
+            else:
+                return bloc, floor, None
+        else:
+            print("Not a correct format")
+            return None, None, None
+
+
     def run(self):
         for message in self.consumer:
             print("%s:%d:%d: key=%s value=%s" %
                   (message.topic, message.partition, message.offset, message.key, message.value))
+
             if message.key.decode("utf-8") == "open_blinds":
-                print("Fewrfewrewrojewr")
-                group_address = str(XBLINDS)+"/"+ str(FLOOR)+"/"+ str(BLOC)
-                knx.send_datas(group_address, 0, 1, 2)
+                bloc, floor, percent = self.decode_knx_infos(message.value.decode("utf-8"))
+                if bloc and floor:
+                    group_address = str(XBLINDS)+"/" + floor + "/" + bloc
+                    knx.send_datas(group_address, 0, 1, 2)
 
             elif message.key.decode("utf-8") == "close_blinds":
-                group_address = str(XBLINDS) + "/" + str(FLOOR) + "/" + str(BLOC)
-                knx.send_datas(group_address, 1, 1, 2)
+                bloc, floor, percent = self.decode_knx_infos(message.value.decode("utf-8"))
+                if bloc and floor:
+                    group_address = str(XBLINDS) + "/" + floor + "/" + bloc
+                    knx.send_datas(group_address, 1, 1, 2)
 
             elif message.key.decode("utf-8") == "percentage_blinds":
-                content = json.loads(message.value.decode("utf-8"))
-                if all(item in content.keys() for item in ['percentage']):
-                    percent = int(content['percentage'] * 255 / 100)
-                    group_address = str(XBLINDSPERCENT) + "/" + str(FLOOR) + "/" + str(BLOC)
+                bloc, floor, percent = self.decode_knx_infos(message.value.decode("utf-8"))
+                if bloc and floor and percent:
+                    group_address = str(XBLINDSPERCENT) + "/" + floor + "/" + bloc
                     knx.send_datas(group_address, percent, 2, 2)
                 else:
                     print("Error key")
 
             elif message.key.decode("utf-8") == "percentage_radiator":
-                content = json.loads(message.value.decode("utf-8"))
-                if all(item in content.keys() for item in ['percentage']):
-                    group_address = str(XRADIATOR) + "/" + str(FLOOR) + "/" + str(BLOC)
-                    percent = int(content['percentage'] * 255 / 100)
+                bloc, floor, percent = self.decode_knx_infos(message.value.decode("utf-8"))
+                if bloc and floor and percent:
+                    group_address = str(XRADIATOR) + "/" + floor + "/" + bloc
                     knx.send_datas(group_address, percent, 2, 2)
                 else:
                     print("Error key")
