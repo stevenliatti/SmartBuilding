@@ -17,18 +17,22 @@ BLOC = 1
 knx = knx_lib.knx()
 
 class producerThread (threading.Thread):
+    KEY_READ_PERCENTAGE_BLINDS = 'read_percentage_blinds'
     def __init__(self, producer, topic):
         threading.Thread.__init__(self)
         self.producer = producer
         self.topic = topic
 
+    def produce(self, percentage_blinds):
+        self.producer.send(self.topic, key=str.encode(self.KEY_READ_PERCENTAGE_BLINDS),
+                           value=str.encode(percentage_blinds))  # Produce the message contain the status of blinds
+
     def run(self):
         while True:
             group_address = str(XBLINDSREAD) + "/" + str(FLOOR) + "/" + str(BLOC)  # Read the state of blinds
             res = knx.send_datas(group_address, 0, 2, 0, True)
-            self.producer.send(self.topic, key=b'read_percentage_blinds', 
-                value=str.encode(str(int(res.data / 255 * 100)))
-            ) # Produce the message contain the status of blinds
+            percentage_blinds = str(int(res.data / 255 * 100))
+            self.produce(percentage_blinds)
             time.sleep(5)
 
 class consumerThread (threading.Thread):
