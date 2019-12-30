@@ -10,8 +10,10 @@ geometry : margin = 2.5cm
 ---
 
 # Introduction
+## Buts
 
-# Analyse et architecture
+# Conception et architecture
+## Protocole d'échange des messages
 <!-- Statistiques -->
 
 # Kafka
@@ -19,7 +21,14 @@ geometry : margin = 2.5cm
 ## Usage dans le projet
 
 # Implémentation
+## Android
+## Rest server Flask
+## Broker Kafka
+## Adapter Kafka
+## KNX lib
+## Zwave lib
+## BDD
 
 # Conclusion
+## Problèmes rencontrés
 ## Améliorations
-## 

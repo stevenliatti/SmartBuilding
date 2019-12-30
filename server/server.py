@@ -27,10 +27,8 @@ servers = ['iot.liatti.ch:29092']
 KNX_TOPIC = "knx"
 OPENZWAVE_TOPIC = "zwave"
 producer = KafkaProducer(bootstrap_servers=servers)
-consumerKNX = KafkaConsumer(KNX_TOPIC, bootstrap_servers=servers)
-consumerZWAVE = KafkaConsumer(OPENZWAVE_TOPIC, bootstrap_servers=servers)
-
-devicesInfos = {}
+consumer = KafkaConsumer(bootstrap_servers=servers)
+consumer.subscribe([KNX_TOPIC, OPENZWAVE_TOPIC])
 
 def manage_blinds(minor, kind, key, percentage=-1):
     query = ("SELECT number, floor "
@@ -99,7 +97,12 @@ def read_percentage_blinds():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # DEVICEID = TROUVE EN FAISANT QUERY SQL
+            # SELECT id, type, knx_device_room_number, number, floor, value, timestamp FROM Room JOIN Beacon ON Beacon.room_number = Room.number JOIN Knx_device ON Room.number = Knx_device.room_number JOIN Knx_log ON Room.number = Knx_log.knx_device_room_number WHERE minor = 12302 AND type = "blind" ORDER BY timestamp DESC LIMIT 1;
+            query = ("SELECT number, floor, value, timestamp "
+                "FROM Room JOIN Beacon ON Beacon.room_number = Room.number "
+                "JOIN Knx_device ON Room.number = Knx_device.room_number "
+                "JOIN Knx_log ON Room.number = Knx_log.knx_device_room_number "
+                "WHERE minor = {} AND type = \"blind\" LIMIT(1);".format(content.get('minor')))
             return devicesInfos.get('DEVICEID')
     return { "success": False }
 
@@ -145,15 +148,39 @@ class consumerThread (threading.Thread):
         threading.Thread.__init__(self)
         self.consumer = consumer
 
+    def decode_knx_infos(self, value):
+        content = json.loads(value)
+        if all(item in content.keys() for item in ['room', 'floor', 'percentage']):
+            bloc = content['room']
+            floor = content['floor']
+            percentage = content['percentage']
+            return bloc, floor, percentage
+        else:
+            print("Not a correct format")
+            return None, None, None
+
     def run(self):
         for message in self.consumer:
             # Consume les messages produits par KNX et OPENZWAVE et les insert
-            # dans la map qui réf les infos des devices
+            # dans les tables de logs de la DB
             content = json.loads(message.value.decode("utf-8"))
-            if all(item in content.keys() for item in ['deviceId']):
-                device_id = int(content['deviceId'])
-                value = content['value']
-                devicesInfos[device_id] = value
+
+            if message.topic == KNX_TOPIC:
+                bloc, floor, percentage = self.decode_knx_infos(content)
+    
+                query = ("INSERT INTO Knx_log "
+                    "(timestamp, value, knx_device_type, knx_device_room_number) "
+                    "VALUES (NOW(), {}, {}, {});".format(percentage, "blind", bloc))
+
+                cursor = mysql.connection.cursor()
+                cursor.execute(query)
+                mysql.connection.commit()
+                cursor.close()
+            elif message.topic == OPENZWAVE_TOPIC:
+                pass
+            else:
+                pass
+
 
 
 from logging import FileHandler, Formatter, DEBUG
@@ -169,10 +196,8 @@ if __name__ == '__main__':
         app.run(host='::', debug=False, use_reloader=False)
 
         # Start threads for consume data produces by devices
-        consumerThreadKNX = consumerThread(consumerKNX)
-        consumerThreadZWAVE = consumerThread(consumerZWAVE)
-        consumerThreadKNX.start()
-        consumerThreadZWAVE.start()
+        consumerThread = consumerThread(consumer)
+        consumerThread.start()
 
     except KeyboardInterrupt:
         exit(0)
