@@ -81,12 +81,146 @@ Cette API joue également le rôle de producteur et de consumateur Kafka afin de
 D'une part, le consomateur Kafka se charge de consommer les différents messages de KNX et Openzwave afin de stocker les informations utiles à l'application et aux statistiques dans la base de données.
 D'autre part, nous avons le producteur Kafka qui se charge de transformer les actions reçues sous forme de requête HTTP en message Kafka envoyé directement dans le bon topic ce qui permet donc d'effectuer les actions demandées en conséquence (ouverture des stors par exemple).
 
+### Routes exposées
+Voici la liste exhaustive des différentes routes mise à disposition par notre API REST : 
+
+#### KNX
+
+## Commands
+
+
+<b> open_blinds </b>
+
+- Method: GET
+- Endpoint: "/open_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+<b> close_blinds </b>
+
+- Method: GET
+- Endpoint: "/close_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+<b> percentage_blinds </b>
+
+- Method: GET
+- Endpoint: "/percentage_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+    - percentage: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+<b> percentage_radiator </b>
+
+- Method: GET
+- Endpoint: "/percentage_radiator"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+    - percentage: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+## Infos
+
+
+<b> read_percentage_blinds </b>
+
+- Method: GET
+- Endpoint: "/read_percentage_blinds"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true, percentage: 42 }`
+- Error: `{ success: false }`
+
+# OpenZWave
+
+## Commands
+
+
+<b> percentage_dimmers </b>
+
+- Method: GET
+- Endpoint: "/percentage_dimmers"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+    - percentage: int
+- Response OK: `{ success: true }`
+- Error: `{ success: false }`
+
+
+## Infos
+
+
+<b> get_network_info </b>
+
+- Method: GET
+- Endpoint: "/get_network_info"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true, info: ... }`
+- Error: `{ success: false }`
+
+
+<b> get_nodes_list </b>
+
+- Method: GET
+- Endpoint: "/get_nodes_list"
+- Params:
+    - uuid: string
+    - major: int
+    - minor: int
+- Response OK: `{ success: true, info: ... }`
+- Error: `{ success: false }`
+
 ## Adapter Kafka
 ??????
 
 ## KNX lib
-En se basant sur le code de l'exercice KNX réalisé au cours du premier service, nous l'avons adapté
+En se basant sur le code de l'exercice KNX réalisé au cours du premier service, nous l'avons adapté de manière à en faire une librairie réutilisabe depuis les producteur et consomateur Kafka.
+Cette libraire contient une classe `knx` qui se charge de créer la connexion avec knx dans son constructeur et expose les différentes méthodes relatives à l'utilisation des devies KNX.
+Voici les méthodes intégrées à notre libraire KNX :
+    - send_datas(self, group_address, data, data_size, apci, read=False)
+    Cette méthode est utilisée afin de transmettre des informations à KNX elle recoit différents arguments variables qui permettent de controller/lire les informations des différentes devices en adaptant leurs emplacement qui sont identifiable à l'aide de l'étage et de la salle (voir protocole KNX).
+    - disconnect(self) => permet de se deconnecter de KNX
 ## Zwave lib
+Nous avons réutilisé la librairie que nous avions développée durant le premier semestre qui comprend les différentes méthodes permettnt d'intéragir avec le réseau Openzwave. 
+Dans le cadre de ce projet, nous n'utilisons plus cette libraire au travers d'un serveur Flask, mais directemnt dans le producteur et le consommateur Kafka.
+Tout cela nous permet donc d'appliquer différentes actions qui ont été consummée et également de produire à intervalles réguliers les informations émise par les devices de notre salle.
+## Protocole des messages
+En ce qui concerne les messages consommés par KNX et openzwave, nous avons choisi de définir notre propre protocol.
+Celui ci fait correspondre la clé du message reçu à l'action à effectuer et le contenu du message aux éventuels paramètres à transmettre. Ces différents paramètres sont au format JSON puis encodés en bytes afin d'être transmits au broker Kafka consumés par une autre entité.
+### KNX
+Pour KNX nous retrouvons les messages suivants : 
+..............flemme continue plus tard
+### Openzwve
+Openzwave est capable de traiter les messages suivants : 
+...................
+
 ## BDD
 En ce qui concerne la base de données, nous avons opté pour une base relationnelle avec MySQL qui nous a permis de représenter les différentes structures de données et les mettre en lien facilement et de manière efficace.
 
