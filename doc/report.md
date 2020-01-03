@@ -197,9 +197,6 @@ Voici la liste exhaustive des différentes routes mise à disposition par notre 
 - Response OK: `{ success: true, info: ... }`
 - Error: `{ success: false }`
 
-## Adapter Kafka
-??????
-
 ## KNX lib
 En se basant sur le code de l'exercice KNX réalisé au cours du premier service, nous l'avons adapté de manière à en faire une librairie réutilisabe depuis les producteur et consomateur Kafka.
 Cette libraire contient une classe `knx` qui se charge de créer la connexion avec knx dans son constructeur et expose les différentes méthodes relatives à l'utilisation des devies KNX.
@@ -211,7 +208,7 @@ Voici les méthodes intégrées à notre libraire KNX :
 Nous avons réutilisé la librairie que nous avions développée durant le premier semestre qui comprend les différentes méthodes permettnt d'intéragir avec le réseau Openzwave. 
 Dans le cadre de ce projet, nous n'utilisons plus cette libraire au travers d'un serveur Flask, mais directemnt dans le producteur et le consommateur Kafka.
 Tout cela nous permet donc d'appliquer différentes actions qui ont été consummée et également de produire à intervalles réguliers les informations émise par les devices de notre salle.
-## Protocole des messages
+## Adapter Kafka OUUU ?????? Protocole des messages
 En ce qui concerne les messages consommés par KNX et openzwave, nous avons choisi de définir notre propre protocol.
 Celui ci fait correspondre la clé du message reçu à l'action à effectuer et le contenu du message aux éventuels paramètres à transmettre. Ces différents paramètres sont au format JSON puis encodés en bytes afin d'être transmits au broker Kafka consumés par une autre entité.
 ### KNX
