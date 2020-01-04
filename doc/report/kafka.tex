@@ -1,0 +1,21 @@
+\subsection{Kafka}
+La technologie d'échange des messages était au choix, nous avons choisi d'experimenter kafka étant donné qu'elle est de plus en plus répendue dans les différents projets, il était donc interessant de la prendre en main au travers de ce projet.
+\subsubsection{Généralités}
+Apache Kafka est une plate-forme de diffusion d'événements distribuée open source, tolérante aux pannes, développée par LinkedIn. Service de journalisation distribué, Kafka est souvent utilisé à la place des courtiers de messages traditionnels en raison de son débit, de son évolutivité, de sa fiabilité et de sa réplication plus élevés. Étant donné que Kafka est un système distribué, les rubriques sont partitionnées et répliquées sur plusieurs noeuds.
+
+Elle permet principalement de :
+\begin{itemize}
+    \item Publier et s'abonner à des flux d'enregistrements, similaires à une file d'attente de messages ou à un système de messagerie d'entreprise.
+    \item Stocker les flux d'enregistrements d'une manière durable à tolérance de pannes
+    \item Traiter les flux d'enregistrements au fur et à mesure qu'ils se produisent.
+\end{itemize}
+
+Les API kafka suivantes sont utilisées dans ce projet :
+\begin{itemize}
+    \item L'API Producer permet à une application de publier un flux d'enregistrements sur un ou plusieurs sujets Kafka.
+    \item L'API Consumer permet à une application de s'abonner à un ou plusieurs sujets et de traiter le flux d'enregistrements qui leur est produit.
+\end{itemize}
+
+\subsubsection{Usage dans le projet}
+Dans le cadre de ce projet, nous avons utilisé kafka afin de communiquer entre les différentes entités de l'application.
+Chacunes d'entre elles (knx, openzawe, API rest Flask) écoute et produit différents messages dans kafka afin de réagire à certains actions et également de produire des informations sans dépendre de la demande demande des client. Au sein de ce projet, nous faisons usage de deux topics principaux "KNX" et "Zwave" qui nous permettent aux différents services d'éméttre et récéptionner les messages qui les concrenent.

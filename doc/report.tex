@@ -1,0 +1,166 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+\renewcommand\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[left=2.5cm,top=2.5cm,right=2.5cm,bottom=2.5cm]{geometry}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{graphicx}
+\usepackage[usenames, dvipsnames]{xcolor}
+\definecolor{mygray}{gray}{0.95}
+
+\usepackage{minted}
+\usemintedstyle{colorful}
+\usepackage{float}
+\floatplacement{figure}{H}
+\usepackage{authblk}
+\usepackage{enumitem}
+\setlist[enumerate]{label*=\arabic*.}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\usepackage{caption}
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\usepackage{array}
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+
+\usepackage{dirtree}
+\usepackage{tabularx}
+
+\usepackage{glossaries}
+	\let\oldnewacronym\newacronym
+	\newcommand*{\provideacronym}[3]{%
+	  \ifglsentryexists{#1}{%
+	  }{%
+	    \oldnewacronym{#1}{#2}{#3}%
+	  }%
+	}
+\makeglossaries
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Projet IoT}
+\rhead{\leftmark}
+\lfoot{Jeremy Favre - Steven Liatti}
+\rfoot{\thepage}
+\renewcommand{\footrulewidth}{1pt}
+
+\usepackage{pdfpages}
+
+\begin{document}
+
+\title{Projet IoT}
+\author{Jeremy Favre - Steven Liatti}
+\date{Janvier 2020}
+\maketitle
+% \begin{figure}
+%     \begin{center}
+%         \includegraphics[width=0.65\textwidth]{img/screenshots/movie_list_framed.png}
+%     \end{center}
+% \end{figure}
+\newpage
+
+
+% \setcounter{tocdepth}{2}
+\addcontentsline{toc}{subsection}{Table des matières}
+\tableofcontents
+\addcontentsline{toc}{subsection}{Table des figures}
+\listoffigures
+% \renewcommand{\listtablename}{Table des tables}
+% \addcontentsline{toc}{subsection}{Table des tables}
+% \listoftables
+\newpage
+\renewcommand\listoflistingscaption{Table des listings de code source}
+\addcontentsline{toc}{subsection}{Table des listings de code source}
+\listoflistings
+
+\subsection*{Conventions typographiques} %-----------------------------------------------------------------------------------------------
+\addcontentsline{toc}{subsection}{Conventions typographiques}
+Lors de la rédaction de ce document, les conventions typographiques ci-dessous ont
+été adoptées.
+\begin{itemize}[label=\textbullet]
+	\item Tous les mots empruntés à la langue anglaise ou latine ont été écrits en \textit{italique}.
+	\item Toute référence à un nom de fichier (ou répertoire), un chemin d'accès, une 
+    utilisation de paramètre, variable, commande utilisable par l'utilisateur, ou extrait de code 
+    source est écrite avec une police d'écriture à \mintinline{text}{chasse fixe}.
+	\item Tout extrait de fichier ou de code est écrit selon le format suivant:
+    \begin{code}
+        \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
+fun main() {
+    println("Hello World!")
+}
+        \end{minted}
+    \end{code}
+\end{itemize}
+
+
+\newacronym{api}{API}{\textit{Application Programming Interface}, Interface de programmation : services offerts par un programme producteur à d'autres programmes consommateurs}
+\newacronym{json}{JSON}{\textit{JavaScript Object Notation}, Format d'échange de données léger, facile à lire et écrire par les humains et les machines}
+\newacronym{xml}{XML}{\textit{Extensible Markup Language}, Langage extensible de description de données}
+\newacronym{jvm}{JVM}{\textit{Java Virtual Machine}, Exécute le bytecode Java sur différents systèmes d'exploitation}
+\printglossary[type=\acronymtype,title={Acronymes}]
+\newpage
+
+
+\section{Introduction} %-----------------------------------------------------------------------------------------------
+\input{report/introduction.tex}
+\newpage
+
+\section{Conception et analyse} %-----------------------------------------------------------------------------------------------
+\input{report/conception.tex}
+\newpage
+
+\section{Kafka} %-----------------------------------------------------------------------------------------------
+\input{report/kafka.tex}
+\newpage
+
+\section{Implémentation} %-----------------------------------------------------------------------------------------------
+\input{report/implementation.tex}
+\newpage
+
+\section{Conclusion} %-----------------------------------------------------------------------------------------------
+\input{report/conclusion.tex}
+\newpage
+
+\section{Références} %-----------------------------------------------------------------------------------------------
+\bibliographystyle{unsrt}
+\bibliography{bib}
+
+\end{document}
+
+% \begin{figure}
+%     \begin{center}
+%         \includegraphics[width=0.8\textwidth]{images/image.png}
+%     \end{center}
+%     \caption{légende}
+%     \label{label}
+% \end{figure}
+
+% \bigbreak
+% \begin{code}
+%     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{rust}
+% fn main() {
+%     println!("Hello, world!");
+% }
+%     \end{minted}
+%     \caption{Hello world en Rust}
+%     \label{label}
+% \end{code}
+% \bigbreak
+
+% \bigbreak
+% \begin{code}
+%     \inputminted[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,
+%         tabsize=2,firstline=157,lastline=185]{rust}{file.rs}
+%     \caption{légende}
+%     \label{label}
+% \end{code}
+% \bigbreak
