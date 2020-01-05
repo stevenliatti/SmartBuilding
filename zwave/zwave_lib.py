@@ -14,6 +14,7 @@ from collections import OrderedDict
 
 from openzwave.network import ZWaveNetwork
 from openzwave.option import ZWaveOption
+from openzwave.value import ZWaveValue
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('openzwave')
@@ -209,7 +210,7 @@ class Backend():
         names = {}
         for node in self.network.nodes.values():
             names[node.node_id] = node.product_name
-            print(node.product_name)
+            print(node)
         return jsonify(names)
 
     def get_nodes_Configuration(self):
@@ -334,14 +335,30 @@ class Backend_with_dimmers(Backend):
         return jsonify(map)
 
     def get_dimmer_level(self, n):
-        self.get_dimmer_level()
-        return "this method gets a dimmer's brightness level of a specific node"
+        if n <= self.network.nodes_count:
+            dimmer = self.network.nodes[n].get_dimmers()
+            for key in dimmer:
+                try:
+                    level = self.network.nodes[n].get_dimmer_level(key)
+                    return jsonify({ "level": level })
+                except:
+                    return jsonify({ "error": "node not a dimmer" })
+        else:
+            return jsonify({ "error": "node not found" })
+
 
     def set_dimmer_level(self, n, level):
+        if n <= self.network.nodes_count:
+            dimmer = self.network.nodes[n].get_dimmers()
+            for key in dimmer:
+                try:
+                    level = self.network.nodes[n].set_dimmer(key, level)
+                    return jsonify({ "level": level })
+                except:
+                    return jsonify({ "error": "node not a dimmer" })
+        else:
+            return jsonify({ "error": "node not found" })
 
-        #### COMPLETE THIS METHOD ##############
-
-        return "this method sets a dimmer's brightness level of a specific node"
 
 
 ###########################################################################################################################
