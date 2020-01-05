@@ -163,7 +163,7 @@ def dimmer_get_level():
 def percentage_dimmers():
     content = request.args
     if content:
-        if all(item in content.keys() for item in ['node_id', 'percentage']):
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             node_id = content.get('node_id')
             percentage = content.get('percentage')
             producer.send(OPENZWAVE_TOPIC, key=b'dimmers_set_level', value=str.encode('{"node_id":' + node_id + ', "percentage": ' + percentage + '}'))
