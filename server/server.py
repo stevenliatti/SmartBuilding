@@ -109,32 +109,65 @@ def read_percentage_blinds():
 ########################## END KNX ROUTES ########################################################################
 
 ########################## OPENZWAVE ROUTES ######################################################################
+@app.route('/sensor_get_temperature', strict_slashes=False)
+def sensor_get_temperature():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            # TROUVER DANS DB NODE_ID
+            # TROUVER DERNIERE MESURE DANS DB
+            return { "success": True }
+    return { "success": False }
+
+@app.route('/sensor_get_humidity', strict_slashes=False)
+def sensor_get_humidity():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            # TROUVER DANS DB NODE_ID
+            # TROUVER DERNIERE MESURE DANS DB
+            return { "success": True }
+    return { "success": False }
+
+@app.route('/sensor_get_luminance', strict_slashes=False)
+def sensor_get_luminance():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            # TROUVER DANS DB NODE_ID
+            # TROUVER DERNIERE MESURE DANS DB
+            return { "success": True }
+    return { "success": False }
+
+@app.route('/sensor_get_motion', strict_slashes=False)
+def sensor_get_motion():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            # TROUVER DANS DB NODE_ID
+            # TROUVER DERNIERE MESURE DANS DB
+            return { "success": True }
+    return { "success": False }
+
+@app.route('/dimmer_get_level', strict_slashes=False)
+def dimmer_get_level():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            # TROUVER DANS DB NODE_ID
+            # TROUVER DERNIERE MESURE DANS DB
+            return { "success": True }
+    return { "success": False }
+
 @app.route('/percentage_dimmers', strict_slashes=False)
 def percentage_dimmers():
     content = request.args
     if content:
-        if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
+        if all(item in content.keys() for item in ['node_id', 'percentage']):
+            node_id = content.get('node_id')
             percentage = content.get('percentage')
-            producer.send(OPENZWAVE_TOPIC, key=b'dimmers_set_level', value=str.encode('{"percentage":' + percentage + '}'))
+            producer.send(OPENZWAVE_TOPIC, key=b'dimmers_set_level', value=str.encode('{"node_id":' + node_id + ', "percentage": ' + percentage + '}'))
             return { "success": True }
-    return { "success": False }
-
-@app.route('/get_network_info', strict_slashes=False)
-def get_network_info():
-    content = request.args
-    if content:
-        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # KEYFORNODEKEYFORNETWORKINFOSLISTE = TROUVE EN FAISANT QUERY SQL
-            return devicesInfos.get('KEYFORNETWORKINFOS')
-    return { "success": False }
-
-@app.route('/get_nodes_list', strict_slashes=False)
-def get_nodes_list():
-    content = request.args
-    if content:
-        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # KEYFORNODELISTE = TROUVE EN FAISANT QUERY SQL
-            return devicesInfos.get('KEYFORNODELISTE')
     return { "success": False }
 
 
