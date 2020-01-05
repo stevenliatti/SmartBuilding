@@ -41,11 +41,23 @@ Celui ci fait correspondre la clé du message reçu à l'action à effectuer et 
 
 \subsubsection{KNX}
 Pour KNX nous retrouvons les messages suivants : 
-..............flemme continue plus tard
+# Production
+    \item `read_percentage_blinds` : Ce messages est produit à intervalles de 5 secondes, il permet d'envoyer dans le topic `KNX` le pourcentage d'ouverture de tous les stores de toutes les salles. 
+
+# Consommation
+    L'étage et la chambre permettent d'identifier l'appareil sur lequel il faut agir, pour cela ces deux paramètres sont donnés dans le corps du message ce qui permet d'intéragir avec le bon device en fonction de la position de l'utilisateur.
+    \item `open_blinds` : Permet d'ouvrir les stores (100\%)
+    \item `close_blinds` : Permet de fermer les stores (0\%)
+    \item `percentage_blinds` : Met les stores à un certain pourcentage qui est passé dans la valeur du message
+    \item `percentage_radiator` : Met les radiateurs à un certain pourcentage qui est passé dans la valeur du message
 
 \subsubsection{Openzwave}
 Openzwave est capable de traiter les messages suivants : 
-...................
+# Production
+    \item
+
+# Consommation
+    \item
 
 \subsection{Base de données}
 En ce qui concerne la base de données, nous avons opté pour une base relationnelle avec MySQL qui nous a permis de représenter les différentes structures de données et les mettre en lien facilement et de manière efficace.

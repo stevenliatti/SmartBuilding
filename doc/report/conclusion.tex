@@ -1,18 +1,18 @@
 \subsection{Bilan personnel}
 Pour conclure, ce projet nous a permit d'apprendre et pratiquer Kafka, une technologie initaliemment inconnue, ce qui fût très instructif. Il nous à également permis d'approfondir les notions vue en cours concernant KNX, Openzwave et la detection des beacons depuis un appareil Android. En ajoutant a tout cela une partie devloppement Android, une base de données SQL et l'utilisation de python. Ce qui fait de ce projet un très bon cas pratique permettant de mettre en lien toutes ces technologies plus interessante les unes que les autres.
-% TODO: Sucage de boule
 
 \subsection{Problèmes rencontrés}
 Les principales difficultés rencontrées durant le développement de ce projet sont les suivantes :
 \begin{itemize}
-    \item Docker python
-    \item KNX la documentation fournie ne correspondait pas parfaitement avec le fonctionnement réeé du protocole
-    \item Openzwave manque d'informations concernant le reset manuel du controller
+    \item Toute l'architecture Kafka est deployée dans Docker. Afin de configurer le tout de manière automatique nous avons rencontrés quelque problèmes notamment liés à la sortie standard des containers basés sur l'image "pyton3". En effet, le container n'affiche pas la sortie standard des scripts python dans les logs si une option spécifique n'est pas renseignée dans le `Docker-compose.yml`.
+    \item En ce qui concerne KNX, la documentation fournie ne correspondait pas parfaitement avec le fonctionnement réel du protocole, notamment au niveau des trames renvoyées après la lecture/écriture des données dans le socket. Ce protocol est également peu pratique lorsqu'on souhaite l'utiliser pour transmettre plusieurs messages consécutifs sans fermer la connexion.
+    \item La procédure d'utilisation fournie pour Openzwave manque d'informations concernant le reset manuel du controller. La documentation officielle manque également de précision pour ceraines méthodes.
 \end{itemize}
 
 % TODO: améliorations
 \subsection{Améliorations possibles}
 Les améliorations suivantes pourraient être apportées au projet :
 \begin{itemize}
-    \item
+    \item Gestion des droits des utilisateurs : chaque utilisateur devrait pouvoir s'authentifier dans l'application à l'aide d'un username/password, stockés en base de données. Chaque utilisateur aurait également une liste des salles associées à son profil. Etant donné que l'application détecte la salle à l'aide du beacoin le plus proche, il serrait alors très simple de savoir si un utilisateur dispose des droits nécessaires pour accéder aux fonctionnalités proposées par les devices de la salle ou il se trouve.
+    \item SCHEMA SQL ??
 \end{itemize}
