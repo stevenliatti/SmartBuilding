@@ -10,11 +10,11 @@ from zwave_lib import Backend_with_dimmers_and_sensors
 backend = Backend_with_dimmers_and_sensors()
 
 sensors = [
-    { "node_id": 3}
+    { "node_id": 2}
 ]
 
 dimmers = [
-    { "node_id": 2}
+    { "node_id": 3}
 ]
 
 
@@ -26,10 +26,10 @@ class producerThread (threading.Thread):
 
     def run(self):
         while True:
-            producer.send(topic, key="sensors_get_sensors_list", value=str.encode(backend.get_sensors_list()))
-            time.sleep(5)
-            producer.send(topic, key="dimmers_get_dimmers_list", value=str.encode(backend.get_dimmers()))
-            time.sleep(5)
+            #producer.send(topic, key="sensors_get_sensors_list", value=str.encode(backend.get_sensors_list()))
+            #time.sleep(5)
+            #producer.send(topic, key="dimmers_get_dimmers_list", value=str.encode(backend.get_dimmers()))
+            #time.sleep(5)
 
             for device in sensors:
                 # sensors_get_temperature
@@ -57,8 +57,9 @@ class producerThread (threading.Thread):
             for device in dimmers:
                 # dimmers_get_level
                 node_id = int(device['node_id'])
+                value = backend.get_dimmer_level(node_id)
                 producer.send(topic, key=b"dimmers_get_level",
-                              value=str.encode(backend.get_dimmer_level(node_id)))
+                              value=str.encode(value))
             time.sleep(5)
 
 class consumerThread (threading.Thread):
@@ -72,6 +73,8 @@ class consumerThread (threading.Thread):
                   (message.topic, message.partition, message.offset, message.key, message.value))
 
             if message.key:
+                # val = '{"node_id": 3, "percentage": 100}'
+                # producer.send("zwave", key=b'dimmers_set_level', value=str.encode(val))
                 if message.key.decode("utf-8") == "dimmers_set_level":
                     content = json.loads(message.value)
                     if all(item in content.keys() for item in ['node_id', 'percentage']):
