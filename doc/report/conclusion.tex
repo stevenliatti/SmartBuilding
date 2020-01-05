@@ -4,7 +4,7 @@ Pour conclure, ce projet nous a permit d'apprendre et pratiquer Kafka, une techn
 \subsection{Problèmes rencontrés}
 Les principales difficultés rencontrées durant le développement de ce projet sont les suivantes :
 \begin{itemize}
-    \item Toute l'architecture Kafka est deployée dans Docker. Afin de configurer le tout de manière automatique nous avons rencontrés quelque problèmes notamment liés à la sortie standard des containers basés sur l'image "pyton3". En effet, le container n'affiche pas la sortie standard des scripts python dans les logs si une option spécifique n'est pas renseignée dans le `Docker-compose.yml`.
+    \item Toute l'architecture Kafka est deployée dans Docker. Afin de configurer le tout de manière automatique nous avons rencontrés quelque problèmes notamment liés à la sortie standard des containers basés sur l'image "pyton3". En effet, le container n'affiche pas la sortie standard des scripts python dans les logs si une option spécifique n'est pas renseignée dans le \mintinline{text}{docker-compose.yml}.
     \item En ce qui concerne KNX, la documentation fournie ne correspondait pas parfaitement avec le fonctionnement réel du protocole, notamment au niveau des trames renvoyées après la lecture/écriture des données dans le socket. Ce protocol est également peu pratique lorsqu'on souhaite l'utiliser pour transmettre plusieurs messages consécutifs sans fermer la connexion.
     \item La procédure d'utilisation fournie pour Openzwave manque d'informations concernant le reset manuel du controller. La documentation officielle manque également de précision pour ceraines méthodes.
 \end{itemize}

@@ -10,7 +10,7 @@ Nous avons également associé un nom de domaine à cette instace ce qui permet 
 
 \subsection{Rest server Flask}
 Etant donné qu'il n'existe pas enciore de librairie permettant d'utiliser dirctement le client Kafka sur Android, nous avons du mettre en place un adapter que nous permet de faire la translation entre Kafka Android.
-Pour ce faire nous avons utilisé la librairie `Flask` de Python 3 qui permet de mettre en place une API REST.
+Pour ce faire nous avons utilisé la librairie Flask de Python 3 qui permet de mettre en place une API REST.
 Cette API joue également le rôle de producteur et de consumateur Kafka afin de mettre en relation les différentes entités.
 D'une part, le consomateur Kafka se charge de consommer les différents messages de KNX et Openzwave afin de stocker les informations utiles à l'application et aux statistiques dans la base de données.
 D'autre part, nous avons le producteur Kafka qui se charge de transformer les actions reçues sous forme de requête HTTP en message Kafka envoyé directement dans le bon topic ce qui permet donc d'effectuer les actions demandées en conséquence (ouverture des stors par exemple).
@@ -22,7 +22,7 @@ Voici la liste exhaustive des différentes routes mise à disposition par notre 
 
 \subsection{KNX lib}
 En se basant sur le code de l'exercice KNX réalisé au cours du premier service, nous l'avons adapté de manière à en faire une librairie réutilisabe depuis les producteur et consomateur Kafka.
-Cette libraire contient une classe `knx` qui se charge de créer la connexion avec knx dans son constructeur et expose les différentes méthodes relatives à l'utilisation des devies KNX.
+Cette libraire contient une classe \mintinline{python}{knx} qui se charge de créer la connexion avec knx dans son constructeur et expose les différentes méthodes relatives à l'utilisation des devies KNX.
 Voici les méthodes intégrées à notre libraire KNX :
 \begin{itemize}
     \item \mintinline{python}{send_datas(self, group_address, data, data_size, apci, read=False)} : cette méthode est utilisée afin de transmettre des informations à KNX elle recoit différents arguments variables qui permettent de controller/lire les informations des différentes devices en adaptant leurs emplacement qui sont identifiable à l'aide de l'étage et de la salle (voir protocole KNX).
@@ -41,23 +41,25 @@ Celui ci fait correspondre la clé du message reçu à l'action à effectuer et 
 
 \subsubsection{KNX}
 Pour KNX nous retrouvons les messages suivants : 
-# Production
-    \item `read_percentage_blinds` : Ce messages est produit à intervalles de 5 secondes, il permet d'envoyer dans le topic `KNX` le pourcentage d'ouverture de tous les stores de toutes les salles. 
+\paragraph{Production}
+\begin{itemize}
+    \item \mintinline{python}{read_percentage_blinds} : Ce messages est produit à intervalles de 5 secondes, il permet d'envoyer dans le topic \mintinline{text}{KNX} le pourcentage d'ouverture de tous les stores de toutes les salles. 
+\end{itemize}
 
-# Consommation
+\paragraph{Consommation}
     L'étage et la chambre permettent d'identifier l'appareil sur lequel il faut agir, pour cela ces deux paramètres sont donnés dans le corps du message ce qui permet d'intéragir avec le bon device en fonction de la position de l'utilisateur.
-    \item `open_blinds` : Permet d'ouvrir les stores (100\%)
-    \item `close_blinds` : Permet de fermer les stores (0\%)
-    \item `percentage_blinds` : Met les stores à un certain pourcentage qui est passé dans la valeur du message
-    \item `percentage_radiator` : Met les radiateurs à un certain pourcentage qui est passé dans la valeur du message
+\begin{itemize}
+    \item \mintinline{python}{open_blinds} : Permet d'ouvrir les stores (100\%)
+    \item \mintinline{python}{close_blinds} : Permet de fermer les stores (0\%)
+    \item \mintinline{python}{percentage_blinds} : Met les stores à un certain pourcentage qui est passé dans la valeur du message
+    \item \mintinline{python}{percentage_radiator} : Met les radiateurs à un certain pourcentage qui est passé dans la valeur du message
+\end{itemize}
 
 \subsubsection{Openzwave}
 Openzwave est capable de traiter les messages suivants : 
-# Production
-    \item
+\paragraph{Production}
 
-# Consommation
-    \item
+\paragraph{Consommation}
 
 \subsection{Base de données}
 En ce qui concerne la base de données, nous avons opté pour une base relationnelle avec MySQL qui nous a permis de représenter les différentes structures de données et les mettre en lien facilement et de manière efficace.

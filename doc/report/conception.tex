@@ -1,3 +1,5 @@
+Notre système s'architecture autour du \textit{message broker} Kafka, visible à la figure \ref{shema_general}. Les contrôleurs KNX et Openzwave gèrent respectivement les stores et les radiateurs ainsi que les lumières et capteurs multi-fonctions (présence, luminance, température, humidité). Ils peuvent d'une part recueillir les informations des \textit{devices} associés, mais également attribuer des nouvelles valeurs pour chacuns. Un utilisateur, muni de l'application mobile et se trouvant à portée d'un Beacon pourra intéragir avec les \textit{devices} de la pièce (\textit{room}) associée avec le Beacon. Ces interactions comportent la visualisation de l'état actuel des \textit{devices} (présence, niveau de température, d'humidité et de lumière, ouverture des stores et des radiateurs) mais aussi leur contrôle (lumière, stores et radiateurs). L'application échangera avec un serveur HTTP REST qui fera office de \textit{backend}, lisant dans la base de données les relations entre Beacons, pièces, devices et utilisateurs. La base de données garde également en mémoire les données des \textit{devices}, pour des éventuelles statistiques.
+
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.8\textwidth]{img/general.png}
@@ -5,10 +7,3 @@
     \caption{Architecture globale du système}
     \label{shema_general}
 \end{figure}
-
-
-\subsection{Protocole d'échange des messages}
-Le Protocole d'échange des messages à été défini selon l'arcitecture visible à la figure "Architecture globale du système", les entités principales de l'application sont le client mobile, les devices KNS, les devices Openzwave et la base de données. Afin de tout mettre le tout en relation, nous avons procédé de manière à échanger les messages dans différents "topics" qui permettent d'identifier le sujet des messages.
-
-\subsection{Statistiques}
-En ce qui concernet les Statistiques, notre architecture de la base de données est pensée de manière à stocker les informations des différents devices dans le temps afin de pouvoir retraçer leurs parcours et établir les statistiques qui en découlent.
