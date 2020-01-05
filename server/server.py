@@ -114,7 +114,7 @@ def sensor_get_temperature():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TROUVER DANS DB NODE_ID
+            # TODO : TROUVER DANS DB NODE_ID
             # TROUVER DERNIERE MESURE DANS DB
             return { "success": True }
     return { "success": False }
@@ -124,7 +124,7 @@ def sensor_get_humidity():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TROUVER DANS DB NODE_ID
+            # TODO : TROUVER DANS DB NODE_ID
             # TROUVER DERNIERE MESURE DANS DB
             return { "success": True }
     return { "success": False }
@@ -134,7 +134,7 @@ def sensor_get_luminance():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TROUVER DANS DB NODE_ID
+            # TODO : TROUVER DANS DB NODE_ID
             # TROUVER DERNIERE MESURE DANS DB
             return { "success": True }
     return { "success": False }
@@ -144,7 +144,7 @@ def sensor_get_motion():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TROUVER DANS DB NODE_ID
+            # TODO : TROUVER DANS DB NODE_ID
             # TROUVER DERNIERE MESURE DANS DB
             return { "success": True }
     return { "success": False }
@@ -154,7 +154,7 @@ def dimmer_get_level():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TROUVER DANS DB NODE_ID
+            # TODO : TROUVER DANS DB NODE_ID
             # TROUVER DERNIERE MESURE DANS DB
             return { "success": True }
     return { "success": False }
@@ -192,6 +192,23 @@ class consumerThread (threading.Thread):
             print("Not a correct format")
             return None, None, None
 
+    def decode_openzwave_infos(self, value):
+        content = json.loads(value)
+        if all(item in content.keys() for item in ['controller', 'sensor', 'location', 'type', 'updateTime', 'value']):
+            controller = content['controller']
+            sensor = content['sensor']
+            location = content['location']
+            type = content['type']
+            updateTime = content['updateTime']
+            value = content['value']
+            return sensor, location, type, updateTime, value
+        elif all(item in content.keys() for item in ['value']):
+            value = content['value']
+            return None, None, None, None, value
+        else:
+            print("Not a correct format")
+            return None, None, None, None, None
+
     def run(self):
         for message in self.consumer:
             # Consume les messages produits par KNX et OPENZWAVE et les insert
@@ -210,7 +227,8 @@ class consumerThread (threading.Thread):
                 mysql.connection.commit()
                 cursor.close()
             elif message.topic == OPENZWAVE_TOPIC:
-                pass
+                sensor, location, type, updateTime, value = self.decode_openzwave_infos(content)
+                ## TODO: QUERRYSQLLLLL !!
             else:
                 pass
 
