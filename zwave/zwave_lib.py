@@ -183,41 +183,6 @@ class Backend():
     #########################################################################################################################
     #########################################################################################################################
 
-    #######################################################################################################################
-    ############# NETWORK #################################################################################################
-    #######################################################################################################################
-
-    def network_info(self):
-        map = {"Network Home ID": self.network.home_id_str}
-        for node in self.network.nodes.values():
-            map_temp = {}
-            map_temp.update({"Is Ready": node.isReady})
-            map_temp.update({"Neighbours": list(node.neighbors)})
-            map_temp.update({"Node ID": node.node_id})
-            map_temp.update({"Node location": node.location})
-            map_temp.update({"Node name": node.name})
-            map_temp.update({"Product name": node.product_name})
-            map_temp.update({"Query Stage": node.getNodeQueryStage})
-            map.update({"Node " + str(node.node_id): map_temp})
-
-        return jsonify(map)
-
-    #######################################################################################################################
-    ############# NODES #################################################################################################
-    #######################################################################################################################
-
-    def get_nodes_list(self):
-        names = {}
-        for node in self.network.nodes.values():
-            names[node.node_id] = node.product_name
-            print(node)
-        return jsonify(names)
-
-    def get_nodes_Configuration(self):
-        # No mention of configuration in the doc
-        return "this method returns a JSON that gives an overview of the network and it's nodes' configuration parameters (like the ID, Wake-up Interval, Group 1 Reports, Group 1 Interval ...)"
-
-
 #######################################################################################################################
 ############# Multisensors #################################################################################################
 #######################################################################################################################
@@ -302,18 +267,6 @@ class Backend_with_sensors(Backend):
                "updateTime": self.timestamps["timestamp" + str(n)],
                "value": self.network.nodes[n].get_battery_level()}
         return jsonify(map)
-
-    def get_all_Measures(self, n):
-
-        #### COMPLETE THIS METHOD ##############
-
-        return "this method gets all the measures of a specific sensor node"
-
-    def set_basic_sensor_nodes_configuration(self, Grp_interval, Grp_reports, Wakeup_interval):
-
-        #### COMPLETE THIS METHOD ##############
-
-        return "this method configures the sensor nodes with a specific configuration"
 
 
 ###########################################################################################################################
