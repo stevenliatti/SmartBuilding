@@ -208,13 +208,15 @@ class Backend_with_sensors(Backend):
                         val = round(value.data, 1)
                         #        if len(node.location) < 3:
                         #            node.location = configpi.sensors[str(node.node_id)][:4]
-                        kafka_message = '{ "controller": ' + str(name) \
-                                        + ', "sensor": ' + str(node.node_id) \
-                                        + ', "location": ' + str(node.location) \
-                                        + ', "type": ' + str(value.label.lower()) \
-                                        + ', "updateTime": ' + str(self.timestamps["timestamp" + str(node.node_id)]) \
-                                        + ', "value": ' + str(val) + ' }'
-                        return kafka_message
+                        res = {
+                            "controller": str(name),
+                            "sensor": str(node.node_id),
+                            "location": str(node.location),
+                            "type": str(value.label.lower()),
+                            "updateTime": str(self.timestamps["timestamp" + str(node.node_id)]),
+                            "value": str(val)
+                        }
+                        return res
 
         return "Node not ready or wrong sensor node !"
 
@@ -230,13 +232,15 @@ class Backend_with_sensors(Backend):
                         val = int(value.data)
                         #       if len(node.location) < 3:
                         #           node.location = configpi.sensors[str(node.node_id)][:4]
-                        kafka_message = '{ "controller": ' + str(name) \
-                                        + ', "sensor": ' + str(node.node_id) \
-                                        + ', "location": ' + str(node.location) \
-                                        + ', "type": ' + str(value.label.lower()) \
-                                        + ', "updateTime": ' + str(self.timestamps["timestamp" + str(node.node_id)]) \
-                                        + ', "value": ' + str(val) + ' }'
-                        return kafka_message
+                        res = {
+                            "controller": str(name),
+                            "sensor": str(node.node_id),
+                            "location": str(node.location),
+                            "type": str(value.label.lower()),
+                            "updateTime": str(self.timestamps["timestamp" + str(node.node_id)]),
+                            "value": str(val)
+                        }
+                        return res
         return "Node not ready or wrong sensor node !"
 
     def get_luminance(self, n):
@@ -248,13 +252,15 @@ class Backend_with_sensors(Backend):
                         val = int(value.data)
                         #       if len(node.location) < 3:
                         #           node.location = configpi.sensors[str(node.node_id)][:4]
-                        kafka_message = '{ "controller": ' + str(name) \
-                                        + ', "sensor": ' + str(node.node_id) \
-                                        + ', "location": ' + str(node.location) \
-                                        + ', "type": ' + str(value.label.lower()) \
-                                        + ', "updateTime": ' + str(self.timestamps["timestamp" + str(node.node_id)]) \
-                                        + ', "value": ' + str(val) + ' }'
-                        return kafka_message
+                        res = {
+                            "controller": str(name),
+                            "sensor": str(node.node_id),
+                            "location": str(node.location),
+                            "type": str(value.label.lower()),
+                            "updateTime": str(self.timestamps["timestamp" + str(node.node_id)]),
+                            "value": str(val)
+                        }
+                        return res
         return "Node not ready or wrong sensor node !"
 
     def get_motion(self, n):
@@ -267,13 +273,15 @@ class Backend_with_sensors(Backend):
                     val = value.data
                     #       if len(node.location) < 3:
                     #           node.location = configpi.sensors[str(node.node_id)][:4]
-                    kafka_message = '{ "controller": ' + str(name) \
-                                    + ', "sensor": ' + str(node.node_id) \
-                                    + ', "location": ' + str(node.location) \
-                                    + ', "type": ' + str(value.label.lower()) \
-                                    + ', "updateTime": ' + str(self.timestamps["timestamp" + str(node.node_id)]) \
-                                    + ', "value": ' + str(val) + ' }'
-                    return kafka_message
+                    res = {
+                        "controller": str(name),
+                        "sensor": str(node.node_id),
+                        "location": str(node.location),
+                        "type": str(value.label.lower()),
+                        "updateTime": str(self.timestamps["timestamp" + str(node.node_id)]),
+                        "value": str(val)
+                    }
+                    return res
         return "Node not ready or wrong sensor node !"
 
     def get_battery(self, n):
@@ -310,8 +318,10 @@ class Backend_with_dimmers(Backend):
             for key in dimmer:
                 try:
                     level = self.network.nodes[n].get_dimmer_level(key)
-                    kafka_message = '{ "value": ' + str(level) + ' }'
-                    return kafka_message
+                    res = {
+                        "value": str(level),
+                    }
+                    return res
                 except:
                     return "error node not a dimmer"
             return "error node not a dimmer"

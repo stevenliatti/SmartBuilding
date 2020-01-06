@@ -10,11 +10,11 @@ from zwave_lib import Backend_with_dimmers_and_sensors
 backend = Backend_with_dimmers_and_sensors()
 
 sensors = [
-    { "node_id": 2}
+    { "node_id": 2, "bloc": 1, "floor": 4}
 ]
 
 dimmers = [
-    { "node_id": 3}
+    { "node_id": 3, "bloc": 1, "floor": 4}
 ]
 
 
@@ -24,42 +24,42 @@ class producerThread (threading.Thread):
         self.producer = producer
         self.topic = topic
 
+    def produce(self, key, data):
+        producer.send(topic, key=str.encode(key),
+                  value=str.encode(json.dumps(data)))
+
     def run(self):
         while True:
-            #producer.send(topic, key="sensors_get_sensors_list", value=str.encode(backend.get_sensors_list()))
-            #time.sleep(5)
-            #producer.send(topic, key="dimmers_get_dimmers_list", value=str.encode(backend.get_dimmers()))
-            #time.sleep(5)
-
             for device in sensors:
+                node = int(device['node_id'])
+
                 # sensors_get_temperature
-                node = int(device['node_id'])
-                producer.send(topic, key=b"sensors_get_temperature",
-                              value=str.encode(backend.get_temperature(node)))
+                res = backend.get_temperature(node)
+                self.produce("sensors_get_temperature", res)
                 time.sleep(1)
+
                 # sensors_get_humidity
-                node = int(device['node_id'])
-                producer.send(topic, key=b"sensors_get_humidity",
-                              value=str.encode(backend.get_humidity(node)))
+                res = backend.get_humidity(node)
+                self.produce("sensors_get_humidity", res)
+
                 time.sleep(1)
+
                 # sensors_get_luminance
-                node = int(device['node_id'])
-                producer.send(topic, key=b"sensors_get_luminance",
-                              value=str.encode(backend.get_luminance(node)))
+                res = backend.get_luminance(node)
+                self.produce("sensors_get_luminance", res)
                 time.sleep(1)
 
                 # sensors_get_motion
-                node = int(device['node_id'])
-                producer.send(topic, key=b"sensors_get_motion",
-                              value=str.encode(backend.get_motion(node)))
+                res = backend.get_motion(node)
+                self.produce("sensors_get_motion", res)
                 time.sleep(1)
 
             for device in dimmers:
-                # dimmers_get_level
                 node_id = int(device['node_id'])
-                value = backend.get_dimmer_level(node_id)
-                producer.send(topic, key=b"dimmers_get_level",
-                              value=str.encode(value))
+                # dimmers_get_level
+                res = backend.get_dimmer_level(node_id)
+                self.produce("dimmers_get_level", res)
+                time.sleep(1)
             time.sleep(5)
 
 class consumerThread (threading.Thread):
