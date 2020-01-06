@@ -1,21 +1,21 @@
-\subsection{Kafka}
-La technologie d'échange des messages était au choix, nous avons choisi d'experimenter kafka étant donné qu'elle est de plus en plus répendue dans les différents projets, il était donc interessant de la prendre en main au travers de ce projet.
-\subsubsection{Généralités}
-Apache Kafka est une plate-forme de diffusion d'événements distribuée open source, tolérante aux pannes, développée par LinkedIn. Service de journalisation distribué, Kafka est souvent utilisé à la place des courtiers de messages traditionnels en raison de son débit, de son évolutivité, de sa fiabilité et de sa réplication plus élevés. Étant donné que Kafka est un système distribué, les rubriques sont partitionnées et répliquées sur plusieurs noeuds.
+La technologie d'échange des messages était au choix, nous avons choisi d'expérimenter Kafka \cite{kafka}, étant donné qu'elle est de plus en plus répandue dans différents projets IoT, il était donc intéressant de la prendre en main au travers de ce projet.
 
-Elle permet principalement de :
+\subsection{Généralités}
+Apache Kafka est une plate-forme de diffusion d'événements distribuée open source, tolérante aux pannes, développée initialement par LinkedIn par l'\textit{Apache Software Foundation}, écrit en Scala. Service de journalisation distribué, Kafka est utilisé en tant que \textit{hub} de messagerie haute performance, en raison de son débit, de son évolutivité, de sa fiabilité et de son mécanisme de réplication. Les messages Kafka peuvent être étiquetés et publiés/consommés dans un "sujet" (ou "\textit{topic}). Chaque message est constitué d'une clé, d'une valeur et d'un \textit{timestamp}. Étant donné que Kafka est un système distribué, les rubriques peuvent être partitionnées et répliquées sur plusieurs noeuds. Les fonctionnalités phare de Kafka sont :
 \begin{itemize}
-    \item Publier et s'abonner à des flux d'enregistrements, similaires à une file d'attente de messages ou à un système de messagerie d'entreprise.
-    \item Stocker les flux d'enregistrements d'une manière durable à tolérance de pannes
-    \item Traiter les flux d'enregistrements au fur et à mesure qu'ils se produisent.
+    \item Publier et s'abonner à des flux de messages, similaires à une file d'attente de messages ou à un système de messagerie d'entreprise.
+    \item Stocker les flux de messages d'une manière durable et tolérante aux pannes.
+    \item Traiter les flux de messages au fur et à mesure qu'ils se produisent.
 \end{itemize}
 
-Les API kafka suivantes sont utilisées dans ce projet :
+Kafka offre quatre \acrshort{api}s principales :
 \begin{itemize}
-    \item L'API Producer permet à une application de publier un flux d'enregistrements sur un ou plusieurs sujets Kafka.
-    \item L'API Consumer permet à une application de s'abonner à un ou plusieurs sujets et de traiter le flux d'enregistrements qui leur est produit.
+    \item L'\acrshort{api} \textit{Producer} permet à une application de publier un flux de messages sur un ou plusieurs \textit{topics} Kafka.
+    \item L'\acrshort{api} \textit{Consumer} permet à une application de s'abonner à un ou plusieurs \textit{topics} et de traiter le flux de messages produit.
+    \item L'\acrshort{api} \textit{Streams} consommant un flux de messages à partir d'un ou plusieurs \textit{topics}, en leur appliquant un traitement, puis les reproduire dans un ou plusieurs \textit{topics}.
+    \item L'\acrshort{api} \textit{Connector} permet de construire des producteurs ou consommateurs Kafka réutilisables et connectés à des applications existantes. Par exemple un connecteur à une base de données qui capture tout changement dans celle-ci.
 \end{itemize}
 
-\subsubsection{Usage dans le projet}
-Dans le cadre de ce projet, nous avons utilisé kafka afin de communiquer entre les différentes entités de l'application.
-Chacunes d'entre elles (knx, openzawe, API rest Flask) écoute et produit différents messages dans kafka afin de réagire à certains actions et également de produire des informations sans dépendre de la demande demande des client. Au sein de ce projet, nous faisons usage de deux topics principaux "KNX" et "Zwave" qui nous permettent aux différents services d'éméttre et récéptionner les messages qui les concrenent.
+\subsection{Usage dans le projet}
+Dans le cadre de ce projet, nous avons utilisé Kafka afin de communiquer entre les différentes entités de l'application.
+Chacunes d'entre elles (KNX, OpenZWave, \acrshort{api} rest Flask) écoute et produit différents messages dans Kafka afin de réagir à certaines actions provenant du client et également de produire des informations à intervalles réguliers, sans dépendre de la demande des client. Au sein de ce projet, nous faisons usage de deux topics principaux "KNX" et "Zwave" qui permettent aux différents services d'émettre et récéptionner les messages qui les concernent.
