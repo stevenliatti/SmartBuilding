@@ -15,10 +15,10 @@ FLOOR = 4
 BLOC = 1
 
 devices = [
-    { "room": 1, "floor": 4 },
-    { "room": 2, "floor": 4 },
-    { "room": 10, "floor": 4 },
-    { "room": 11, "floor": 4 }
+    { "bloc": 1, "floor": 4 },
+    { "bloc": 2, "floor": 4 },
+    { "bloc": 10, "floor": 4 },
+    { "bloc": 11, "floor": 4 }
 ]
 
 knx = knx_lib.knx()
@@ -37,10 +37,10 @@ class producerThread (threading.Thread):
     def run(self):
         while True:
             for device in devices:
-                group_address = str(XBLINDSREAD) + "/" + str(device['floor']) + "/" + str(device['room'])  # Read the state of blinds
+                group_address = str(XBLINDSREAD) + "/" + str(device['floor']) + "/" + str(device['bloc'])  # Read the state of blinds
                 res = knx.send_datas(group_address, 0, 2, 0, True)
                 percentage_blinds = str(int(res.data / 255 * 100))
-                kafka_message = '{ "room": ' + str(device['room']) + ', "floor": ' + str(device['floor']) + ', "percentage": ' + str(percentage_blinds) + ' }'
+                kafka_message = '{ "bloc": ' + str(device['bloc']) + ', "floor": ' + str(device['floor']) + ', "percentage": ' + str(percentage_blinds) + ' }'
                 self.produce(kafka_message)
                 time.sleep(1)
             time.sleep(5)
@@ -52,8 +52,8 @@ class consumerThread (threading.Thread):
 
     def decode_knx_infos(self, value):
         content = json.loads(value)
-        if all(item in content.keys() for item in ['room', 'floor']):
-            bloc = content['room']
+        if all(item in content.keys() for item in ['bloc', 'floor']):
+            bloc = content['bloc']
             floor = content['floor']
             if all(item in content.keys() for item in ['percentage']):
                 percent = int(content['percentage'] * 255 / 100)
