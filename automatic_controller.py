@@ -95,28 +95,28 @@ class consumerThread (threading.Thread):
             print("%s:%d:%d: key=%s value=%s" %
                   (message.topic, message.partition, message.offset, message.key, message.value))
 
-            msgKey = message.key.decode("utf-8")
-            content = message.value.decode("utf-8")
+            if message.key:
+                msgKey = message.key.decode("utf-8")
+                content = message.value.decode("utf-8")
+                if msgKey == "sensors_get_temperature" or msgKey == "sensors_get_humidity" or msgKey == "sensors_get_luminance" or msgKey == "sensors_get_motion" or msgKey == "read_percentage_blinds":  ## KNX
+                    if message.topic == KNX_TOPIC:
+                        if all(item in content.keys() for item in ['bloc', 'floor', 'kind', 'reason', 'percentage']):
+                            bloc = content['bloc']
+                            floor = content['floor']
+                            kind = content['kind']
+                            reason = content['reason']
+                            value = content['percentage']
+                            device_id = self.find_device_id(kind, bloc, floor)
+                    elif message.topic == OPENZWAVE_TOPIC:
+                        if all(item in content.keys() for item in ['node_id', 'reason', 'value']):
+                            node_id = content['node_id']
+                            reason = content['reason']
+                            value = content['value']
+                            device_id = self.find_device_id(node_id=node_id)
 
-            if msgKey == "sensors_get_temperature" or msgKey == "sensors_get_humidity" or msgKey == "sensors_get_luminance" or msgKey == "sensors_get_motion" or msgKey == "read_percentage_blinds":  ## KNX
-                if message.topic == KNX_TOPIC:
-                    if all(item in content.keys() for item in ['bloc', 'floor', 'kind', 'reason', 'percentage']):
-                        bloc = content['bloc']
-                        floor = content['floor']
-                        kind = content['kind']
-                        reason = content['reason']
-                        value = content['percentage']
-                        device_id = self.find_device_id(kind, bloc, floor)
-                elif message.topic == OPENZWAVE_TOPIC:
-                    if all(item in content.keys() for item in ['node_id', 'reason', 'value']):
-                        node_id = content['node_id']
-                        reason = content['reason']
-                        value = content['value']
-                        device_id = self.find_device_id(node_id=node_id)
-
-                if DEVICES[device_id][reason] != value:
-                    DEVICES[device_id][reason] = value
-                    self.intelligence(device_id, msgKey, DEVICES[device_id])
+                    if DEVICES[device_id][reason] != value:
+                        DEVICES[device_id][reason] = value
+                        self.intelligence(device_id, msgKey, DEVICES[device_id])
 
 
 
