@@ -23,6 +23,12 @@ services:
     depends_on:
       - kafka
     entrypoint: ["./wait-for-it.sh", "kafka:9092", "--timeout=0", "--", "python", "-u", "consumer.py"]
+  db_to_kafka:
+      build: db_to_kafka
+      depends_on:
+        - kafka
+        - db
+      entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=0", "--", "python", "-u", "db_to_kafka.py"]
   db:
     image: mysql:8.0
     ports:
