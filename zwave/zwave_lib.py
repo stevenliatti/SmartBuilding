@@ -167,27 +167,26 @@ class Backend_with_sensors(Backend):
 
     def get_value(self, node_id, label):
         for node in self.network.nodes.itervalues():
-            if node.node_id == node_id and node.isReady and node_id != 1:
-            and "timestamp" + str(node.node_id) in self.timestamps:
+            if node.node_id == node_id and node.isReady and node_id != 1 and "timestamp" + str(node.node_id) in self.timestamps:
                 values = node.get_values(0x31, "User", "All", True, False)
                 for value in values.itervalues():
                     if value.label == label:
                         val = round(value.data, 1)
                         return {
-                            "node_id": str(node.node_id),
+                            "node_id": node.node_id,
                             "reason": str(value.label.lower()),
-                            "value": str(val)
+                            "value": val
                         }
         return "Node not ready or wrong sensor node !"
 
     def get_temperature(self, node_id):
-        return get_value(node_id, "Temperature")
+        return self.get_value(node_id, "Temperature")
 
     def get_humidity(self, node_id):
-        return get_value(node_id, "Relative Humidity")
+        return self.get_value(node_id, "Relative Humidity")
 
     def get_luminance(self, node_id):
-        return get_value(node_id, "Luminance")
+        return self.get_value(node_id, "Luminance")
 
     def get_motion(self, n):
         node = self.network.nodes[n]
@@ -198,9 +197,9 @@ class Backend_with_sensors(Backend):
                 if value.label == "Sensor":
                     val = value.data
                     return {
-                        "node_id": str(node.node_id),
+                        "node_id": node.node_id,
                         "reason": str(value.label.lower()),
-                        "value": str(val)
+                        "value": val
                     }
         return "Node not ready or wrong sensor node !"
 
@@ -227,7 +226,7 @@ class Backend_with_dimmers(Backend):
             for key in dimmer:
                 try:
                     level = self.network.nodes[n].get_dimmer_level(key)
-                    return { "node_id": n, "reason": "get_dimmer_level", "value": str(level) }
+                    return { "node_id": n, "reason": "get_dimmer_level", "value": level }
                 except:
                     return "error node not a dimmer"
         else:
@@ -239,7 +238,7 @@ class Backend_with_dimmers(Backend):
             for key in dimmer:
                 try:
                     level = self.network.nodes[n].set_dimmer(key, level)
-                    return '{ "node_id": ' + n + ', "reason": "set_dimmer_level", "value": ' + str(level) + ' }'
+                    return { "node_id": n, "reason": "set_dimmer_level", "value": level }
                 except:
                     return "error node not a dimmer"
         else:
