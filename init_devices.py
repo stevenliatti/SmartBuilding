@@ -13,7 +13,8 @@ class init_devices:
     def map_devices(self):
         map = {}
         for message in self.consumer:
-            content = json.loads(message.value)
+            print("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition, message.offset, message.key, message.value))
+            content = json.loads(message.value.decode("utf-8"))
             if all(item in content.keys() for item in ['device_id', 'room_number', 'kind', 'bloc', 'floor']):
                 map[content['device_id']] = content
 

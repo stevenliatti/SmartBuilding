@@ -43,4 +43,4 @@ for (device_id, room_number, node_id, name) in cursor:
 cursor.close()
 cnx.close()
 
-producer.send('db', key=str.encode('end_read_db'))
+producer.send('db', key=str.encode('end_read_db'), value=str.encode('end_read_db'))

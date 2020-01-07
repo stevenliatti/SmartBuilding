@@ -7,4 +7,4 @@ RUN pip install mysql-connector-python
 
 COPY *.py ./
 
-ENTRYPOINT [ "python", "consumer.py" ]
+ENTRYPOINT [ "python", "db_to_kafka.py" ]
