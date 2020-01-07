@@ -205,10 +205,10 @@ INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NO
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 41, "luminance", 9);
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 43, "luminance", 9);
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 44, "luminance", 9);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "luminance", 9);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 1, "luminance", 9);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "luminance", 9);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 1, "luminance", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "sensor", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 1, "sensor", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "sensor", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 1, "sensor", 9);
 
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "get_dimmer_level", 10);
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "get_dimmer_level", 10);

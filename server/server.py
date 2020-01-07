@@ -4,10 +4,8 @@ import sys
 import time
 import os
 
-import threading
 import json
 from kafka import KafkaProducer
-from kafka import KafkaConsumer
 
 file_path = os.path.dirname(__file__)
 sys.path.insert(0, file_path)
@@ -26,8 +24,6 @@ servers = ['iot.liatti.ch:29092']
 KNX_TOPIC = "knx"
 OPENZWAVE_TOPIC = "zwave"
 producer = KafkaProducer(bootstrap_servers=servers)
-consumer = KafkaConsumer(bootstrap_servers=servers)
-consumer.subscribe([KNX_TOPIC, OPENZWAVE_TOPIC])
 
 def manage_knx(minor, kind, key, percentage=-1):
     query = ("SELECT bloc, floor FROM KnxNode JOIN Device ON \
@@ -60,7 +56,7 @@ def read_logs(minor, reason):
     cursor.execute(query)
     value = cursor.fetchone()
     cursor.close()
-    return value
+    return value[0]
 
 ########################## KNX ROUTES ########################################################################
 
@@ -160,89 +156,29 @@ def percentage_dimmers():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
-            node_id = content.get('node_id')
             percentage = content.get('percentage')
-            producer.send(OPENZWAVE_TOPIC, key=b'dimmers_set_level', value=str.encode('{"node_id":' + node_id + ', "percentage": ' + percentage + '}'))
+
+            query = ("SELECT node_id FROM ZwaveNode JOIN Device ON \
+                Device.id = ZwaveNode.device_id JOIN Beacon ON \
+                Beacon.room_number = Device.room_number \
+                WHERE minor = {} AND name = \"{}\";".format(content.get('minor'), "ZE27"))
+            print(query)
+            cursor = mysql.connection.cursor()
+            cursor.execute(query)
+            node_ids = cursor.fetchone()
+
+            for id in node_ids:
+                res = {
+                    "node_id": id,
+                    "percentage": percentage
+                }
+                producer.send(OPENZWAVE_TOPIC, key=b'dimmers_set_level', value=str.encode(json.dumps(res)))
+
             return { "success": True }
     return { "success": False }
 
 
 ########################## END OPENZWAVE ROUTES ##################################################################
-
-
-########################## CONSUMER THREAD #######################################################################
-
-class consumerThread (threading.Thread):
-    def __init__(self, consumer):
-        threading.Thread.__init__(self)
-        self.consumer = consumer
-
-    def decode_knx_infos(self, value):
-        content = json.loads(value)
-        if all(item in content.keys() for item in ['kind', 'bloc', 'floor', 'reason', 'percentage']):
-            kind = content['kind']
-            bloc = content['bloc']
-            floor = content['floor']
-            reason = content['reason']
-            percentage = content['percentage']
-            return kind, bloc, floor, reason, percentage
-        else:
-            print("Not a correct format")
-            return None, None, None, None
-
-    def decode_openzwave_infos(self, value):
-        content = json.loads(value)
-        if all(item in content.keys() for item in ['node_id', 'reason', 'value']):
-            node_id = content['node_id']
-            reason = content['reason']
-            value = content['value']
-            return node_id, reason, value
-        else:
-            print("Not a correct format")
-            return None, None, None
-
-    def run(self):
-        for message in self.consumer:
-            # Consume les messages produits par KNX et OPENZWAVE et les insert
-            # dans les tables de logs de la DB
-            content = json.loads(message.value.decode("utf-8"))
-
-            if message.topic == KNX_TOPIC:
-                kind, bloc, floor, reason, percentage = self.decode_knx_infos(content)
-
-                query = ("SELECT device_id KnxNode WHERE KnxNode.kind = 'blind' \
-                        AND bloc = {} and floor = {};".format(bloc, floor))
-                print(query)
-                cursor = mysql.connection.cursor()
-                cursor.execute(query)
-                device_id = cursor.fetchone()
-
-                query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
-                        VALUES (NOW(), {}, {}, {});"
-                        .format(percentage, reason, device_id))
-                print(query)
-                cursor.execute(query)
-                # mysql.connection.commit()
-                cursor.close()
-            elif message.topic == OPENZWAVE_TOPIC:
-                node_id, reason, value = self.decode_openzwave_infos(content)
-                query = ("SELECT device_id FROM ZwaveNode WHERE node_id = {};"
-                        .format(node_id))
-                print(query)
-                cursor = mysql.connection.cursor()
-                cursor.execute(query)
-                device_id = cursor.fetchone()
-
-                query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
-                        VALUES (NOW(), {}, {}, {});"
-                        .format(value, reason, device_id))
-                print(query)
-                cursor.execute(query)
-                cursor.close()
-            else:
-                pass
-
-
 
 from logging import FileHandler, Formatter, DEBUG
 
@@ -252,12 +188,7 @@ if __name__ == '__main__':
         file_handler.setLevel(DEBUG)
         file_handler.setFormatter(Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
         app.logger.addHandler(file_handler)
-
         app.run(host='::', debug=False, use_reloader=False)
-
-        # Start threads for consume data produces by devices
-        consumerThread = consumerThread(consumer)
-        consumerThread.start()
 
     except KeyboardInterrupt:
         exit(0)
