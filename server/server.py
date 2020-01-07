@@ -21,7 +21,6 @@ app.config['MYSQL_PASSWORD'] = 'iot'
 app.config['MYSQL_DB'] = 'iot'
 app.config['MYSQL_HOST'] = 'db'
 mysql = MySQL(app)
-# mysql.init_app(app)
 
 servers = ['iot.liatti.ch:29092']
 KNX_TOPIC = "knx"
@@ -30,25 +29,38 @@ producer = KafkaProducer(bootstrap_servers=servers)
 consumer = KafkaConsumer(bootstrap_servers=servers)
 consumer.subscribe([KNX_TOPIC, OPENZWAVE_TOPIC])
 
-def manage_blinds(minor, kind, key, percentage=-1):
-    query = ("SELECT number, floor "
-        "FROM Room JOIN Beacon ON Beacon.room_number = Room.number "
-        "JOIN Knx_device ON Room.number = Knx_device.room_number "
-        "WHERE minor = {} AND type = \"{}\";".format(minor, kind))
-    
+def manage_knx(minor, kind, key, percentage=-1):
+    query = ("SELECT bloc, floor FROM KnxNode JOIN Device ON \
+            Device.id = KnxNode.device_id JOIN Beacon ON \
+            Beacon.room_number = Device.room_number \
+            WHERE minor = {} AND KnxNode.kind = \"{}\";".format(minor, kind))
     print(query)
     cursor = mysql.connection.cursor()
     cursor.execute(query)
-    room, floor = cursor.fetchone()
+    bloc, floor = cursor.fetchone()
     cursor.close()
 
     if percentage != -1:
-        kafka_message = '{ "room": ' + str(room) + ', "floor": ' + str(floor) + ', "percentage": ' + str(percentage) + ' }'
+        kafka_message = '{ "bloc": ' + str(bloc) + ', "floor": ' + str(floor) + ', "percentage": ' + str(percentage) + ' }'
     else:
-        kafka_message = '{ "room": ' + str(room) + ', "floor": ' + str(floor) + ' }'
+        kafka_message = '{ "bloc": ' + str(bloc) + ', "floor": ' + str(floor) + ' }'
 
     print(kafka_message)
     producer.send(KNX_TOPIC, key=str.encode(key), value=str.encode(kafka_message))
+
+def read_logs(minor, reason):
+    query = ("SELECT value FROM Log JOIN Device \
+        ON Device.id = Log.device_id JOIN Beacon ON \
+        Beacon.room_number = Device.room_number \
+        WHERE minor = {} AND reason = \"{}\" \
+        ORDER BY timestamp DESC LIMIT 1;"
+        .format(minor, reason))
+    print(query)
+    cursor = mysql.connection.cursor()
+    cursor.execute(query)
+    value = cursor.fetchone()
+    cursor.close()
+    return value
 
 ########################## KNX ROUTES ########################################################################
 
@@ -57,7 +69,7 @@ def open_blinds():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            manage_blinds(content.get('minor'), 'blind', 'open_blinds')
+            manage_knx(content.get('minor'), 'blind', 'open_blinds')
             return { "success": True }
     return { "success": False }
 
@@ -67,7 +79,7 @@ def close_blinds():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            manage_blinds(content.get('minor'), 'blind', 'close_blinds')
+            manage_knx(content.get('minor'), 'blind', 'close_blinds')
             return { "success": True }
     return { "success": False }
 
@@ -78,7 +90,7 @@ def percentage_blinds():
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             percentage = content.get('percentage')
-            manage_blinds(content.get('minor'), 'blind', 'percentage_blinds', percentage)
+            manage_knx(content.get('minor'), 'blind', 'percentage_blinds', percentage)
             return { "success": True }
     return { "success": False }
 
@@ -88,7 +100,7 @@ def percentage_radiator():
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor', 'percentage']):
             percentage = content.get('percentage')
-            manage_blinds(content.get('minor'), 'radiator', 'percentage_radiator', percentage)
+            manage_knx(content.get('minor'), 'radiator', 'percentage_radiator', percentage)
             return { "success": True }
     return { "success": False }
 
@@ -97,13 +109,7 @@ def read_percentage_blinds():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # SELECT id, type, knx_device_room_number, number, floor, value, timestamp FROM Room JOIN Beacon ON Beacon.room_number = Room.number JOIN Knx_device ON Room.number = Knx_device.room_number JOIN Knx_log ON Room.number = Knx_log.knx_device_room_number WHERE minor = 12302 AND type = "blind" ORDER BY timestamp DESC LIMIT 1;
-            query = ("SELECT number, floor, value, timestamp "
-                "FROM Room JOIN Beacon ON Beacon.room_number = Room.number "
-                "JOIN Knx_device ON Room.number = Knx_device.room_number "
-                "JOIN Knx_log ON Room.number = Knx_log.knx_device_room_number "
-                "WHERE minor = {} AND type = \"blind\" LIMIT(1);".format(content.get('minor')))
-            return devicesInfos.get('DEVICEID')
+            return { "success": True, "value": read_logs(content.get('minor'), 'read_percentage_blinds') }
     return { "success": False }
 
 ########################## END KNX ROUTES ########################################################################
@@ -114,9 +120,7 @@ def sensor_get_temperature():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TODO : TROUVER DANS DB NODE_ID
-            # TROUVER DERNIERE MESURE DANS DB
-            return { "success": True }
+            return { "success": True, "value": read_logs(content.get('minor'), 'temperature') }
     return { "success": False }
 
 @app.route('/sensor_get_humidity', strict_slashes=False)
@@ -124,9 +128,7 @@ def sensor_get_humidity():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TODO : TROUVER DANS DB NODE_ID
-            # TROUVER DERNIERE MESURE DANS DB
-            return { "success": True }
+            return { "success": True, "value": read_logs(content.get('minor'), 'relative humidity') }
     return { "success": False }
 
 @app.route('/sensor_get_luminance', strict_slashes=False)
@@ -134,9 +136,7 @@ def sensor_get_luminance():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TODO : TROUVER DANS DB NODE_ID
-            # TROUVER DERNIERE MESURE DANS DB
-            return { "success": True }
+            return { "success": True, "value": read_logs(content.get('minor'), 'luminance') }
     return { "success": False }
 
 @app.route('/sensor_get_motion', strict_slashes=False)
@@ -144,9 +144,7 @@ def sensor_get_motion():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TODO : TROUVER DANS DB NODE_ID
-            # TROUVER DERNIERE MESURE DANS DB
-            return { "success": True }
+            return { "success": True, "value": read_logs(content.get('minor'), 'sensor') }
     return { "success": False }
 
 @app.route('/dimmer_get_level', strict_slashes=False)
@@ -154,9 +152,7 @@ def dimmer_get_level():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            # TODO : TROUVER DANS DB NODE_ID
-            # TROUVER DERNIERE MESURE DANS DB
-            return { "success": True }
+            return { "success": True, "value": read_logs(content.get('minor'), 'value') }
     return { "success": False }
 
 @app.route('/percentage_dimmers', strict_slashes=False)
@@ -183,31 +179,26 @@ class consumerThread (threading.Thread):
 
     def decode_knx_infos(self, value):
         content = json.loads(value)
-        if all(item in content.keys() for item in ['room', 'floor', 'percentage']):
-            bloc = content['room']
+        if all(item in content.keys() for item in ['kind', 'bloc', 'floor', 'percentage']):
+            kind = content['kind']
+            bloc = content['bloc']
             floor = content['floor']
             percentage = content['percentage']
-            return bloc, floor, percentage
+            return kind, bloc, floor, percentage
         else:
             print("Not a correct format")
             return None, None, None
 
     def decode_openzwave_infos(self, value):
         content = json.loads(value)
-        if all(item in content.keys() for item in ['controller', 'sensor', 'location', 'type', 'updateTime', 'value']):
-            controller = content['controller']
-            sensor = content['sensor']
-            location = content['location']
-            type = content['type']
-            updateTime = content['updateTime']
+        if all(item in content.keys() for item in ['node_id', 'reason', 'value']):
+            node_id = content['node_id']
+            reason = content['reason']
             value = content['value']
-            return sensor, location, type, updateTime, value
-        elif all(item in content.keys() for item in ['value']):
-            value = content['value']
-            return None, None, None, None, value
+            return node_id, reason, value
         else:
             print("Not a correct format")
-            return None, None, None, None, None
+            return None, None, None
 
     def run(self):
         for message in self.consumer:
@@ -216,19 +207,37 @@ class consumerThread (threading.Thread):
             content = json.loads(message.value.decode("utf-8"))
 
             if message.topic == KNX_TOPIC:
-                bloc, floor, percentage = self.decode_knx_infos(content)
-    
-                query = ("INSERT INTO Knx_log "
-                    "(timestamp, value, knx_device_type, knx_device_room_number) "
-                    "VALUES (NOW(), {}, {}, {});".format(percentage, "blind", bloc))
+                kind, bloc, floor, percentage = self.decode_knx_infos(content)
 
+                query = ("SELECT device_id KnxNode WHERE KnxNode.kind = 'blind' \
+                        AND bloc = {} and floor = {};".format(bloc, floor))
+                print(query)
                 cursor = mysql.connection.cursor()
                 cursor.execute(query)
-                mysql.connection.commit()
+                device_id = cursor.fetchone()
+
+                query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
+                        VALUES (NOW(), {}, {}, {});"
+                        .format(percentage, "read_percentage_blinds", device_id))
+                print(query)
+                cursor.execute(query)
+                # mysql.connection.commit()
                 cursor.close()
             elif message.topic == OPENZWAVE_TOPIC:
-                sensor, location, type, updateTime, value = self.decode_openzwave_infos(content)
-                ## TODO: QUERRYSQLLLLL !!
+                node_id, reason, value = self.decode_openzwave_infos(content)
+                query = ("SELECT device_id FROM ZwaveNode WHERE node_id = {};"
+                        .format(node_id))
+                print(query)
+                cursor = mysql.connection.cursor()
+                cursor.execute(query)
+                device_id = cursor.fetchone()
+
+                query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
+                        VALUES (NOW(), {}, {}, {});"
+                        .format(value, reason, device_id))
+                print(query)
+                cursor.execute(query)
+                cursor.close()
             else:
                 pass
 
