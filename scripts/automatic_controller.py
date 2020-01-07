@@ -14,7 +14,6 @@ class automatic_controller:
     def __init__(self, consumer, producer):
         init = init_devices()
         self.DEVICES = init.map_devices()
-        print(self.DEVICES)
         self.consumer = consumer
         self.producer = producer
 
@@ -25,10 +24,10 @@ class automatic_controller:
         device = self.DEVICES[device_id]
         devices_knx_in_room = []
         dimmers_zwave_in_room = []
-        if all(item in device.keys() for item in ['room']):
-            room = device['room']
+        if 'room_number' in device.keys():
+            room_number = device['room_number']
             for key in self.DEVICES:
-                if self.DEVICES[key]['room'] == room:
+                if self.DEVICES[key]['room_number'] == room_number:
                     if all(item in self.DEVICES[key].keys() for item in ['kind']):
                         devices_knx_in_room.append(self.DEVICES[key])
                     elif all(item in self.DEVICES[key].keys() for item in ['name']):
@@ -71,18 +70,23 @@ class automatic_controller:
         map = {'node_id': node_id}
         if msgKey == "sensors_get_luminance" or msgKey == "sensors_get_motion":
             time = int(strftime("%H", gmtime()))
-            if (time > 19 or time < 7) and deviceChanged['sensor'] and deviceChanged['luminance'] <= 20:
+            if ((time > 19 or time < 7) and deviceChanged['sensor']) or deviceChanged['luminance'] <= 20:
                 map['percentage'] = 90
+                self.produce(OPENZWAVE_TOPIC, 'dimmers_set_level', json.dumps(map))
+            else:
+                map['percentage'] = 0
                 self.produce(OPENZWAVE_TOPIC, 'dimmers_set_level', json.dumps(map))
 
     def find_device_id(self, kind=None, bloc=None, floor=None, node_id=None):
         for key in self.DEVICES:
             if node_id:
-                if self.DEVICES[key]['node_id'] == node_id:
-                    return key
+                if all(item in self.DEVICES[key].keys() for item in ['node_id']):
+                    if self.DEVICES[key]['node_id'] == node_id:
+                        return key
             else:
-                if self.DEVICES[key]['kind'] == kind and self.DEVICES[key]['bloc'] == bloc and self.DEVICES[key]['floor'] == floor:
-                    return key
+                if all(item in self.DEVICES[key].keys() for item in ['bloc', 'floor', 'kind']):
+                    if self.DEVICES[key]['kind'] == kind and self.DEVICES[key]['bloc'] == bloc and self.DEVICES[key]['floor'] == floor:
+                        return key
 
 
     def run(self):
@@ -92,7 +96,7 @@ class automatic_controller:
 
             if message.key:
                 msgKey = message.key.decode("utf-8")
-                content = message.value.decode("utf-8")
+                content = json.loads(message.value.decode("utf-8"))
                 if msgKey == "sensors_get_temperature" or msgKey == "sensors_get_humidity" or msgKey == "sensors_get_luminance" or msgKey == "sensors_get_motion" or msgKey == "read_percentage_blinds":  ## KNX
                     if message.topic == KNX_TOPIC:
                         if all(item in content.keys() for item in ['bloc', 'floor', 'kind', 'reason', 'percentage']):
@@ -109,9 +113,14 @@ class automatic_controller:
                             value = content['value']
                             device_id = self.find_device_id(node_id=node_id)
 
-                    if self.DEVICES[device_id][reason] != value:
+                    if 'reason' in self.DEVICES[device_id]:
+                        if self.DEVICES[device_id][reason] != value:
+                            self.DEVICES[device_id][reason] = value
+                            self.intelligence(device_id, msgKey, self.DEVICES[device_id])
+                    else:
                         self.DEVICES[device_id][reason] = value
                         self.intelligence(device_id, msgKey, self.DEVICES[device_id])
+
 
 
 

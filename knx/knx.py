@@ -5,6 +5,8 @@ from kafka import KafkaConsumer
 import time
 import json
 
+from init_devices import init_devices
+
 import knx_lib
 
 XBLINDS = 1
@@ -14,19 +16,14 @@ XRADIATOR = 0
 FLOOR = 4
 BLOC = 1
 
-devices = [
-    { "bloc": 1, "floor": 4 },
-    { "bloc": 2, "floor": 4 },
-    { "bloc": 10, "floor": 4 },
-    { "bloc": 11, "floor": 4 }
-]
-
 knx = knx_lib.knx()
 
 class producerThread (threading.Thread):
     KEY_READ_PERCENTAGE_BLINDS = 'read_percentage_blinds'
     def __init__(self, producer, topic):
         threading.Thread.__init__(self)
+        init = init_devices()
+        self.DEVICES = init.map_devices()
         self.producer = producer
         self.topic = topic
 
@@ -36,19 +33,20 @@ class producerThread (threading.Thread):
 
     def run(self):
         while True:
-            for device in devices:
-                group_address = str(XBLINDSREAD) + "/" + str(device['floor']) + "/" + str(device['bloc'])  # Read the state of blinds
-                res = knx.send_datas(group_address, 0, 2, 0, True)
-                percentage_blinds = str(int(res.data / 255 * 100))
-                kafka_message = {
-                    "kind": str(XBLINDSREAD),
-                    "bloc": str(device['bloc']),
-                    "floor": str(device['floor']),
-                    "reason": self.KEY_READ_PERCENTAGE_BLINDS,
-                    "value": str(percentage_blinds)
-                }
-                self.produce(json.dumps(kafka_message))
-                time.sleep(1)
+            for key in self.DEVICES:
+                if all(item in self.DEVICES[key].keys() for item in ['device_id', 'room_number', 'kind', 'bloc', 'floor']):
+                    group_address = str(XBLINDSREAD) + "/" + str(self.DEVICES[key]['floor']) + "/" + str(self.DEVICES[key]['bloc'])  # Read the state of blinds
+                    res = knx.send_datas(group_address, 0, 2, 0, True)
+                    percentage_blinds = str(int(res.data / 255 * 100))
+                    kafka_message = {
+                        "kind": str(XBLINDSREAD),
+                        "bloc": str(self.DEVICES[key]['bloc']),
+                        "floor": str(self.DEVICES[key]['floor']),
+                        "reason": self.KEY_READ_PERCENTAGE_BLINDS,
+                        "value": str(percentage_blinds)
+                    }
+                    self.produce(json.dumps(kafka_message))
+                    time.sleep(1)
             time.sleep(5)
 
 class consumerThread (threading.Thread):

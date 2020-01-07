@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-import threading
 from kafka import KafkaConsumer
 import json
 
-
 class init_devices:
     def __init__(self):
-        threading.Thread.__init__(self)
         self.consumer = KafkaConsumer(auto_offset_reset='earliest', bootstrap_servers=['iot.liatti.ch:29092'])
         self.consumer.subscribe(['db'])
 
@@ -23,4 +20,11 @@ class init_devices:
 
                     if all(item in content.keys() for item in ['device_id', 'room_number', 'node_id', 'name']):
                         map[content['device_id']] = content
+
+                    if 'device_id' in content.keys():
+                        map[content['device_id']]['sensor'] = 0
+                        map[content['device_id']]['relative humidity'] = 0
+                        map[content['device_id']]['luminance'] = 0
+                        map[content['device_id']]['temperature'] = 0
+
         return map

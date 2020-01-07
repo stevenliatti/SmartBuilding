@@ -162,10 +162,6 @@ INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (10, "knx");
 INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (11, "knx");
 INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (1, "zwave");
 INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (1, "zwave");
-INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (2, "zwave");
-INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (2, "zwave");
-INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (10, "zwave");
-INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (11, "zwave");
 
 INSERT INTO `iot`.`KnxNode` (`kind`, `bloc`, `floor`, `device_id`) VALUES ("radiator", 1, 4, 1);
 INSERT INTO `iot`.`KnxNode` (`kind`, `bloc`, `floor`, `device_id`) VALUES ("radiator", 2, 4, 2);
@@ -178,10 +174,6 @@ INSERT INTO `iot`.`KnxNode` (`kind`, `bloc`, `floor`, `device_id`) VALUES ("blin
 
 INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (2, "Multisensor 6", 9);
 INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (3, "ZE27", 10);
-INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (4, "Multisensor 6", 11);
-INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (5, "ZE27", 12);
-INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (6, "Multisensor 6", 13);
-INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (7, "ZE27", 14);
 
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 142, "read_percentage_blinds", 5);
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 143, "read_percentage_blinds", 5);
@@ -213,8 +205,12 @@ INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NO
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 41, "luminance", 9);
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 43, "luminance", 9);
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 44, "luminance", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "luminance", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 1, "luminance", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "luminance", 9);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 1, "luminance", 9);
 
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "value", 10);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "value", 10);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 50, "value", 10);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 50, "value", 10);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "get_dimmer_level", 10);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 0, "get_dimmer_level", 10);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 50, "get_dimmer_level", 10);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 50, "get_dimmer_level", 10);

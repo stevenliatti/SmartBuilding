@@ -1,0 +1,1 @@
+../scripts/init_devices.py

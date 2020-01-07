@@ -4,62 +4,55 @@ from kafka import KafkaProducer
 from kafka import KafkaConsumer
 import json
 import time
+from init_devices import init_devices
 
 from zwave_lib import Backend_with_dimmers_and_sensors
 
 backend = Backend_with_dimmers_and_sensors()
 
-sensors = [
-    { "node_id": 2, "bloc": 1, "floor": 4}
-]
-
-dimmers = [
-    { "node_id": 3, "bloc": 1, "floor": 4}
-]
-
-
 class producerThread (threading.Thread):
     def __init__(self, producer, topic):
         threading.Thread.__init__(self)
+        init = init_devices()
+        self.DEVICES = init.map_devices()
         self.producer = producer
         self.topic = topic
 
     def produce(self, key, data):
-        producer.send(topic, key=str.encode(key),
-                  value=str.encode(json.dumps(data)))
+        producer.send(topic, key=str.encode(key), value=str.encode(json.dumps(data)))
 
     def run(self):
         while True:
-            for device in sensors:
-                node = int(device['node_id'])
+            for key in self.DEVICES:
+                if 'node_id' in self.DEVICES[key].keys():
+                    node_id = int(self.DEVICES[key]['node_id'])
 
-                # sensors_get_temperature
-                res = backend.get_temperature(node)
-                self.produce("sensors_get_temperature", res)
-                time.sleep(1)
+                    if self.DEVICES[key]['name'] == 'Multisensor 6':
+                        # sensors_get_temperature
+                        res = backend.get_temperature(node_id)
+                        self.produce("sensors_get_temperature", res)
+                        time.sleep(1)
 
-                # sensors_get_humidity
-                res = backend.get_humidity(node)
-                self.produce("sensors_get_humidity", res)
+                        # sensors_get_humidity
+                        res = backend.get_humidity(node_id)
+                        self.produce("sensors_get_humidity", res)
 
-                time.sleep(1)
+                        time.sleep(1)
 
-                # sensors_get_luminance
-                res = backend.get_luminance(node)
-                self.produce("sensors_get_luminance", res)
-                time.sleep(1)
+                        # sensors_get_luminance
+                        res = backend.get_luminance(node_id)
+                        self.produce("sensors_get_luminance", res)
+                        time.sleep(1)
 
-                # sensors_get_motion
-                res = backend.get_motion(node)
-                self.produce("sensors_get_motion", res)
-                time.sleep(1)
-
-            for device in dimmers:
-                node_id = int(device['node_id'])
-                # dimmers_get_level
-                res = backend.get_dimmer_level(node_id)
-                self.produce("dimmers_get_level", res)
-                time.sleep(1)
+                        # sensors_get_motion
+                        res = backend.get_motion(node_id)
+                        self.produce("sensors_get_motion", res)
+                        time.sleep(1)
+                    elif self.DEVICES[key]['name'] == 'ZE27':
+                        # dimmers_get_level
+                        res = backend.get_dimmer_level(node_id)
+                        self.produce("dimmers_get_level", res)
+                        time.sleep(1)
             time.sleep(5)
 
 class consumerThread (threading.Thread):
@@ -73,8 +66,6 @@ class consumerThread (threading.Thread):
                   (message.topic, message.partition, message.offset, message.key, message.value))
 
             if message.key:
-                # val = '{"node_id": 3, "percentage": 100}'
-                # producer.send("zwave", key=b'dimmers_set_level', value=str.encode(val))
                 if message.key.decode("utf-8") == "dimmers_set_level":
                     content = json.loads(message.value)
                     if all(item in content.keys() for item in ['node_id', 'percentage']):
