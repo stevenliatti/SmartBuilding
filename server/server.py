@@ -152,7 +152,7 @@ def dimmer_get_level():
     content = request.args
     if content:
         if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
-            return { "success": True, "value": read_logs(content.get('minor'), 'value') }
+            return { "success": True, "value": read_logs(content.get('minor'), 'get_dimmer_level') }
     return { "success": False }
 
 @app.route('/percentage_dimmers', strict_slashes=False)
@@ -179,15 +179,16 @@ class consumerThread (threading.Thread):
 
     def decode_knx_infos(self, value):
         content = json.loads(value)
-        if all(item in content.keys() for item in ['kind', 'bloc', 'floor', 'percentage']):
+        if all(item in content.keys() for item in ['kind', 'bloc', 'floor', 'reason', 'percentage']):
             kind = content['kind']
             bloc = content['bloc']
             floor = content['floor']
+            reason = content['reason']
             percentage = content['percentage']
-            return kind, bloc, floor, percentage
+            return kind, bloc, floor, reason, percentage
         else:
             print("Not a correct format")
-            return None, None, None
+            return None, None, None, None
 
     def decode_openzwave_infos(self, value):
         content = json.loads(value)
@@ -207,7 +208,7 @@ class consumerThread (threading.Thread):
             content = json.loads(message.value.decode("utf-8"))
 
             if message.topic == KNX_TOPIC:
-                kind, bloc, floor, percentage = self.decode_knx_infos(content)
+                kind, bloc, floor, reason, percentage = self.decode_knx_infos(content)
 
                 query = ("SELECT device_id KnxNode WHERE KnxNode.kind = 'blind' \
                         AND bloc = {} and floor = {};".format(bloc, floor))
@@ -218,7 +219,7 @@ class consumerThread (threading.Thread):
 
                 query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
                         VALUES (NOW(), {}, {}, {});"
-                        .format(percentage, "read_percentage_blinds", device_id))
+                        .format(percentage, reason, device_id))
                 print(query)
                 cursor.execute(query)
                 # mysql.connection.commit()
@@ -247,7 +248,6 @@ from logging import FileHandler, Formatter, DEBUG
 
 if __name__ == '__main__':
     try:
-        #backend.start()
         file_handler = FileHandler("flask.log")
         file_handler.setLevel(DEBUG)
         file_handler.setFormatter(Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
