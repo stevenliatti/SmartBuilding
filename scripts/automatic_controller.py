@@ -1,44 +1,39 @@
 #!/usr/bin/env python3
-import threading
 from kafka import KafkaProducer
 from kafka import KafkaConsumer
 import time
 from time import gmtime, strftime
 import json
+from init_devices import init_devices
 
 KNX_TOPIC = "knx"
 OPENZWAVE_TOPIC = "zwave"
 
-DEVICES = {
-    "1": {"node_id": 5, "humidity": 10, 'room': 10},
-    "2": {"bloc": 5, "floor": 10, 'room': 10},
-    "3": {"bloc": 5, "floor": 10, 'room': 2},
-    "4": {"bloc": 5, "floor": 10, 'room': 10}
-}
 
-class consumerThread (threading.Thread):
+class automatic_controller:
     def __init__(self, consumer, producer):
-        threading.Thread.__init__(self)
+        init = init_devices()
+        self.DEVICES = init.map_devices()
+        print(self.DEVICES)
         self.consumer = consumer
         self.producer = producer
 
     def produce(self, topic, key, value):
-        self.producer.send(topic, key=str.encode(key),
-                           value=str.encode(value))
+        self.producer.send(topic, key=str.encode(key), value=str.encode(value))
 
     def find_devices_in_room(self, device_id):
-        device = DEVICES[device_id]
+        device = self.DEVICES[device_id]
         devices_knx_in_room = []
         dimmers_zwave_in_room = []
         if all(item in device.keys() for item in ['room']):
             room = device['room']
-            for key in DEVICES:
-                if DEVICES[key]['room'] == room:
-                    if all(item in DEVICES[key].keys() for item in ['kind']):
-                        devices_knx_in_room.append(DEVICES[key])
-                    elif all(item in DEVICES[key].keys() for item in ['name']):
-                        if DEVICES[key]['name'] == 'ZE27':
-                            dimmers_zwave_in_room.append(DEVICES[key])
+            for key in self.DEVICES:
+                if self.DEVICES[key]['room'] == room:
+                    if all(item in self.DEVICES[key].keys() for item in ['kind']):
+                        devices_knx_in_room.append(self.DEVICES[key])
+                    elif all(item in self.DEVICES[key].keys() for item in ['name']):
+                        if self.DEVICES[key]['name'] == 'ZE27':
+                            dimmers_zwave_in_room.append(self.DEVICES[key])
         return devices_knx_in_room, dimmers_zwave_in_room
 
     def intelligence(self, device_id, msgKey, deviceChanged):
@@ -81,12 +76,12 @@ class consumerThread (threading.Thread):
                 self.produce(OPENZWAVE_TOPIC, 'dimmers_set_level', json.dumps(map))
 
     def find_device_id(self, kind=None, bloc=None, floor=None, node_id=None):
-        for key in DEVICES:
+        for key in self.DEVICES:
             if node_id:
-                if DEVICES[key]['node_id'] == node_id:
+                if self.DEVICES[key]['node_id'] == node_id:
                     return key
             else:
-                if DEVICES[key]['kind'] == kind and DEVICES[key]['bloc'] == bloc and DEVICES[key]['floor'] == floor:
+                if self.DEVICES[key]['kind'] == kind and self.DEVICES[key]['bloc'] == bloc and self.DEVICES[key]['floor'] == floor:
                     return key
 
 
@@ -114,20 +109,21 @@ class consumerThread (threading.Thread):
                             value = content['value']
                             device_id = self.find_device_id(node_id=node_id)
 
-                    if DEVICES[device_id][reason] != value:
-                        DEVICES[device_id][reason] = value
-                        self.intelligence(device_id, msgKey, DEVICES[device_id])
+                    if self.DEVICES[device_id][reason] != value:
+                        self.DEVICES[device_id][reason] = value
+                        self.intelligence(device_id, msgKey, self.DEVICES[device_id])
 
 
 
 if __name__ == "__main__":
+    print("Wait for DB...")
+    # time.sleep(30)
     topic = "knx"
     servers = ['iot.liatti.ch:29092']
     producer = KafkaProducer(bootstrap_servers=servers)
     consumer = KafkaConsumer(bootstrap_servers=servers)
     consumer.subscribe([KNX_TOPIC, OPENZWAVE_TOPIC])
     time.sleep(5)
-    c = consumerThread(consumer, producer)
-    c.start()
-    c.join()
-    print("join threads")
+    print("Service start")
+    ac = automatic_controller(consumer, producer)
+    ac.run()

@@ -165,9 +165,9 @@ class Backend_with_sensors(Backend):
                 map.update({node.node_id: node.product_name})
         return jsonify(map)
 
-    def get_value(self, node_id, label)
+    def get_value(self, node_id, label):
         for node in self.network.nodes.itervalues():
-            if node.node_id == node_id and node.isReady and node_id != 1 
+            if node.node_id == node_id and node.isReady and node_id != 1:
             and "timestamp" + str(node.node_id) in self.timestamps:
                 values = node.get_values(0x31, "User", "All", True, False)
                 for value in values.itervalues():

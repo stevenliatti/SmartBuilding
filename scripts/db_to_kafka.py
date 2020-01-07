@@ -40,7 +40,7 @@ for (device_id, room_number, node_id, name) in cursor:
     print(device)
     time.sleep(0.1)
 
+producer.send('db', key=str.encode('end_read_db'), value=str.encode('end_read_db'))
+
 cursor.close()
 cnx.close()
-
-producer.send('db', key=str.encode('end_read_db'), value=str.encode('end_read_db'))

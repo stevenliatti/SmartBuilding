@@ -2,9 +2,8 @@ FROM python:latest
 
 WORKDIR /app
 RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && chmod +x wait-for-it.sh
-RUN pip install kafka-python
-RUN pip install mysql-connector-python
+RUN pip install kafka-python mysql-connector-python
 
 COPY *.py ./
 
-ENTRYPOINT [ "python", "db_to_kafka.py" ]
+ENTRYPOINT [ "python", "consumer.py" ]
