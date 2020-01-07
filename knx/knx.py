@@ -40,8 +40,14 @@ class producerThread (threading.Thread):
                 group_address = str(XBLINDSREAD) + "/" + str(device['floor']) + "/" + str(device['bloc'])  # Read the state of blinds
                 res = knx.send_datas(group_address, 0, 2, 0, True)
                 percentage_blinds = str(int(res.data / 255 * 100))
-                kafka_message = '{ "bloc": ' + str(device['bloc']) + ', "floor": ' + str(device['floor']) + ', "percentage": ' + str(percentage_blinds) + ' }'
-                self.produce(kafka_message)
+                kafka_message = {
+                    "kind": str(XBLINDSREAD),
+                    "bloc": str(device['bloc']),
+                    "floor": str(device['floor']),
+                    "reason": self.KEY_READ_PERCENTAGE_BLINDS,
+                    "value": str(percentage_blinds)
+                }
+                self.produce(json.dumps(kafka_message))
                 time.sleep(1)
             time.sleep(5)
 
