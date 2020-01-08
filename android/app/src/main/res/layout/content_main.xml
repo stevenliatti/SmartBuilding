@@ -13,114 +13,234 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingStart="20dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
 
         <TextView
             android:id="@+id/room_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="50sp"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="#122ECA"
+            android:textSize="50sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal" >
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/customborder"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Room infos"
+                    android:textColor="#122ECA"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/read_percentage_blinds"
-                    android:textSize="20sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/sensor_get_temperature"
-                    android:textSize="20sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/sensor_get_humidity"
-                    android:textSize="20sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/sensor_get_luminance"
-                    android:textSize="20sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/sensor_get_motion"
-                    android:textSize="20sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/dimmer_get_level"
-                    android:textSize="20sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/customborder"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/light_button_on"
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Devices commands"
+                    android:textColor="#122ECA"
+                    android:textSize="14sp" />
+
+                <Switch
+                    android:id="@+id/switch_light"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/light_on"
+                    android:text="Light "
                     android:visibility="invisible" />
 
-                <Button
-                    android:id="@+id/light_button_off"
+                <Switch
+                    android:id="@+id/switch_blinds"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/light_off"
+                    android:layout_marginTop="30dp"
+                    android:text="Blinds"
                     android:visibility="invisible" />
 
-                <Button
-                    android:id="@+id/open_blind_button"
+                <Switch
+                    android:id="@+id/switch_radiators"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/open_blind"
+                    android:layout_marginTop="30dp"
+                    android:text="Radiators"
                     android:visibility="invisible" />
 
-                <Button
-                    android:id="@+id/close_blind_button"
+                <TextView
+                    android:id="@+id/txt_light"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/close_blind"
+                    android:layout_marginTop="30dp"
+                    android:text="Light Level"
                     android:visibility="invisible" />
 
-                <Button
-                    android:id="@+id/open_radiator_button"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBar_light"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:visibility="invisible" />
+
+                    <TextView
+                        android:id="@+id/percentage_light"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:visibility="invisible"
+                        tools:text="0%" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_blinds"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/open_radiator"
+                    android:layout_marginTop="30dp"
+                    android:text="Blind level"
                     android:visibility="invisible" />
 
-                <Button
-                    android:id="@+id/close_radiator_button"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBar_blind"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible" />
+
+                    <TextView
+                        android:id="@+id/percentage_blinds"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:visibility="invisible"
+                        tools:text="0%" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_radiators"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/close_radiator"
+                    android:layout_marginTop="30dp"
+                    android:text="Radiator level"
                     android:visibility="invisible" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekbar_radiator"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible" />
+
+                    <TextView
+                        android:id="@+id/percentage_radiators"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:visibility="invisible"
+                        tools:text="0%" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/customborder"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stats (last 3 hours)"
+                android:textColor="#122ECA"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/temperature_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/humidity_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/luminance_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
 

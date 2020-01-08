@@ -3,15 +3,18 @@ package ch.hes.master.beaconsdetector
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.Button
+import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.estimote.coresdk.common.config.EstimoteSDK
 import com.estimote.coresdk.common.requirements.SystemRequirementsChecker
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion
 import com.estimote.coresdk.service.BeaconManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.content_main.view.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
@@ -38,12 +41,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sensorGetMotionView: TextView
     private lateinit var dimmerGetLevelView: TextView
 
-    private lateinit var lightOnButton: Button
-    private lateinit var lightOffButton: Button
-    private lateinit var openBlindButton: Button
-    private lateinit var closeBlindButton: Button
-    private lateinit var openRadiatorButton: Button
-    private lateinit var closeRadiatorButton: Button
+
+    private lateinit var lightSwitch: Switch
+    private lateinit var blindSwitch: Switch
+    private lateinit var radiatorSwitch: Switch
+
+    private lateinit var lightSeekbar: SeekBar
+    private lateinit var blindSeekbar: SeekBar
+    private lateinit var radiatorSeekbar: SeekBar
 
     private lateinit var beaconManager: BeaconManager
     private lateinit var region: BeaconRegion
@@ -78,61 +83,156 @@ class MainActivity : AppCompatActivity() {
         sensorGetMotionView = findViewById(R.id.sensor_get_motion)
         dimmerGetLevelView = findViewById(R.id.dimmer_get_level)
 
-        lightOnButton = findViewById(R.id.light_button_on)
-        lightOffButton = findViewById(R.id.light_button_off)
-        openBlindButton = findViewById(R.id.open_blind_button)
-        closeBlindButton = findViewById(R.id.close_blind_button)
-        openRadiatorButton = findViewById(R.id.open_radiator_button)
-        closeRadiatorButton = findViewById(R.id.close_radiator_button)
 
-        lightOnButton.setOnClickListener {
-            val url = "$baseUrl/percentage_dimmers?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=100"
-            requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    println(result)
-                }
-            })
+        lightSwitch = findViewById(R.id.switch_light)
+        blindSwitch = findViewById(R.id.switch_blinds)
+        radiatorSwitch = findViewById(R.id.switch_radiators)
+
+        val lightTxt: TextView = findViewById(R.id.txt_light)
+        lightSeekbar = findViewById(R.id.seekBar_light)
+        val blindTxt: TextView = findViewById(R.id.txt_blinds)
+        blindSeekbar = findViewById(R.id.seekBar_blind)
+        val radiatorTxt: TextView = findViewById(R.id.txt_radiators)
+        radiatorSeekbar = findViewById(R.id.seekbar_radiator)
+
+        val lightPercentTxt: TextView = findViewById(R.id.percentage_light)
+        val blindPercentTxt: TextView = findViewById(R.id.percentage_blinds)
+        val radiatorPercentTxt: TextView = findViewById(R.id.percentage_radiators)
+        lightPercentTxt.text = "0%"
+        blindPercentTxt.text = "0%"
+        radiatorPercentTxt.text = "0%"
+
+        val temperature_txt: TextView = findViewById(R.id.temperature_txt)
+        val humidity_txt: TextView = findViewById(R.id.humidity_txt)
+        val luminance_txt: TextView = findViewById(R.id.luminance_txt)
+
+
+
+        lightSwitch.setOnClickListener {
+            if(lightSwitch.isChecked) {
+                val url = "$baseUrl/percentage_dimmers?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=100"
+                requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                lightSeekbar.progress = 100
+                lightPercentTxt.text = "100%"
+            } else {
+                val url = "$baseUrl/percentage_dimmers?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=0"
+                requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                lightSeekbar.progress = 0
+                lightPercentTxt.text = "0%"
+            }
         }
-        lightOffButton.setOnClickListener {
-            val url = "$baseUrl/percentage_dimmers?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=0"
-            requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    println(result)
-                }
-            })
+
+        blindSwitch.setOnClickListener {
+            if(blindSwitch.isChecked) {
+                val url = "$baseUrl/open_blinds?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}"
+                requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                blindSeekbar.progress = 100
+                blindPercentTxt.text = "100%"
+            } else {
+                val url = "$baseUrl/close_blinds?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}"
+                requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                blindSeekbar.progress = 0
+                blindPercentTxt.text = "0%"
+            }
         }
-        openBlindButton.setOnClickListener {
-            val url = "$baseUrl/open_blinds?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}"
-            requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    println(result)
-                }
-            })
+
+        radiatorSwitch.setOnClickListener {
+            if(radiatorSwitch.isChecked) {
+                val url = "$baseUrl/percentage_radiator?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=100"
+                requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                radiatorSeekbar.progress = 100
+                radiatorPercentTxt.text = "100%"
+            } else {
+                val url = "$baseUrl/percentage_radiator?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=1"
+                requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                radiatorSeekbar.progress = 0
+                radiatorPercentTxt.text = "0%"
+            }
         }
-        closeBlindButton.setOnClickListener {
-            val url = "$baseUrl/close_blinds?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}"
-            requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    println(result)
+
+        lightSeekbar.setOnSeekBarChangeListener (object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seek: SeekBar) {
+                val url = "$baseUrl/percentage_dimmers?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=${seek.progress}"
+                requestController.httpGet(url, seek.context, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                lightPercentTxt.text = seek.progress.toString() + '%'
+                lightSwitch.isChecked = true
+                if (seek.progress == 0) {
+                    lightSwitch.isChecked = false
                 }
-            })
-        }
-        openRadiatorButton.setOnClickListener {
-            val url = "$baseUrl/percentage_radiator?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=100"
-            requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    println(result)
+            }
+
+        })
+
+        blindSeekbar.setOnSeekBarChangeListener (object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seek: SeekBar) {
+                val url = "$baseUrl/percentage_blinds?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=${seek.progress}"
+                requestController.httpGet(url, seek.context, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                blindPercentTxt.text = seek.progress.toString() + '%'
+                blindSwitch.isChecked = true
+                if (seek.progress == 0) {
+                    blindSwitch.isChecked = false
                 }
-            })
-        }
-        closeRadiatorButton.setOnClickListener {
-            val url = "$baseUrl/percentage_radiator?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=1"
-            requestController.httpGet(url, this, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {
-                    println(result)
+            }
+        })
+
+        radiatorSeekbar.setOnSeekBarChangeListener (object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seek: SeekBar) {
+                val url = "$baseUrl/percentage_radiator?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}&percentage=${seek.progress}"
+                requestController.httpGet(url, seek.context, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {
+                        println(result)
+                    }
+                })
+                radiatorPercentTxt.text = seek.progress.toString() + '%'
+                radiatorSwitch.isChecked = true
+                if (seek.progress == 0) {
+                    radiatorSwitch.isChecked = false
                 }
-            })
-        }
+            }
+        })
+
+
 
         EstimoteSDK.initialize(applicationContext, "", "")
         EstimoteSDK.enableDebugLogging(true)
@@ -214,12 +314,85 @@ class MainActivity : AppCompatActivity() {
                         }
                     })
 
-                    lightOnButton.visibility = View.VISIBLE
-                    lightOffButton.visibility = View.VISIBLE
-                    openBlindButton.visibility = View.VISIBLE
-                    closeBlindButton.visibility = View.VISIBLE
-                    openRadiatorButton.visibility = View.VISIBLE
-                    closeRadiatorButton.visibility = View.VISIBLE
+                    requestController.httpGet("$baseUrl/get_devices?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}", this, object : ServerCallback<JSONObject> {
+                        override fun onSuccess(result: JSONObject) {
+                            val devices = result.getJSONArray("devices")
+                            lightSwitch.isVisible = false
+                            lightSeekbar.isVisible = false
+                            lightTxt.isVisible = false
+                            lightPercentTxt.isVisible = false
+                            blindSwitch.isVisible = false
+                            blindSeekbar.isVisible = false
+                            blindTxt.isVisible = false
+                            blindPercentTxt.isVisible = false
+                            radiatorSwitch.isVisible = false
+                            radiatorSeekbar.isVisible = false
+                            radiatorTxt.isVisible = false
+                            radiatorPercentTxt.isVisible = false
+
+                            for (i in 0 until devices.length()) {
+                                val jsObj = devices.getJSONObject(i)
+
+                                when {
+                                    jsObj.getString("name") == "blind" -> {
+                                        blindSwitch.isVisible = true
+                                        blindSeekbar.isVisible = true
+                                        blindTxt.isVisible = true
+                                        blindPercentTxt.isVisible = true
+                                    }
+                                    jsObj.getString("name") == "radiator" -> {
+                                        radiatorSwitch.isVisible = true
+                                        radiatorSeekbar.isVisible = true
+                                        radiatorTxt.isVisible = true
+                                        radiatorPercentTxt.isVisible = true
+                                    }
+                                    jsObj.getString("name") == "ZE27" -> {
+                                        lightSwitch.isVisible = true
+                                        lightSeekbar.isVisible = true
+                                        lightTxt.isVisible = true
+                                        lightPercentTxt.isVisible = true
+                                    }
+                                }
+                            }
+                        }
+                    })
+
+
+                    requestController.httpGet("$baseUrl/avg_temperature?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}", this, object : ServerCallback<JSONObject> {
+                        override fun onSuccess(result: JSONObject) {
+                            try {
+                                val avg_temperature = result.getInt("avg_temperature")
+                                temperature_txt.text = avg_temperature.toString() + "° celsius"
+                            }
+                            catch (e: JSONException) {
+                                println("avg_temperature: value not found ($e)")
+                            }
+                        }
+                    })
+
+                    requestController.httpGet("$baseUrl/avg_humidity?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}", this, object : ServerCallback<JSONObject> {
+                        override fun onSuccess(result: JSONObject) {
+                            try {
+                                val avg_humidity = result.getInt("avg_humidity")
+                                humidity_txt.text = avg_humidity.toString() + "%"
+                            }
+                            catch (e: JSONException) {
+                                println("avg_humidity: value not found ($e)")
+                            }
+                        }
+                    })
+
+                    requestController.httpGet("$baseUrl/avg_luminance?uuid=${actualBeacon.uuid}&major=${actualBeacon.major}&minor=${actualBeacon.minor}", this, object : ServerCallback<JSONObject> {
+                        override fun onSuccess(result: JSONObject) {
+                            try {
+                                val avg_luminance = result.getInt("avg_luminance")
+                                luminance_txt.text = avg_luminance.toString() + " lumen"
+                            }
+                            catch (e: JSONException) {
+                                println("avg_luminance: value not found ($e)")
+                            }
+                        }
+                    })
                 }
 
             }
