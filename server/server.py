@@ -239,6 +239,60 @@ def get_devices():
 
             return { "success": True, "devices": devices }
 
+@app.route('/avg_temperature', strict_slashes=False)
+def avg_temperature():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            query = ("select cast(avg(value) as signed) as avg_temperature from Log \
+                join Device on Device.id = device_id join Beacon \
+                on Beacon.room_number = Device.room_number \
+                WHERE minor = {} and reason = 'temperature' \
+                and timestamp >= NOW() - INTERVAL 3 hour;"
+                .format(content.get('minor')))
+            print(query)
+            cursor = mysql.connection.cursor()
+            cursor.execute(query)
+            avg_temperature = cursor.fetchone()[0]
+
+            return { "success": True, "avg_temperature": avg_temperature }
+
+@app.route('/avg_humidity', strict_slashes=False)
+def avg_humidity():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            query = ("select cast(avg(value) as signed) as avg_humidity from Log \
+                join Device on Device.id = device_id join Beacon \
+                on Beacon.room_number = Device.room_number \
+                WHERE minor = {} and reason = 'relative humidity' \
+                and timestamp >= NOW() - INTERVAL 3 hour;"
+                .format(content.get('minor')))
+            print(query)
+            cursor = mysql.connection.cursor()
+            cursor.execute(query)
+            avg_humidity = cursor.fetchone()[0]
+
+            return { "success": True, "avg_humidity": avg_humidity }
+
+@app.route('/avg_luminance', strict_slashes=False)
+def avg_luminance():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            query = ("select cast(avg(value) as signed) as avg_luminance from Log \
+                join Device on Device.id = device_id join Beacon \
+                on Beacon.room_number = Device.room_number \
+                WHERE minor = {} and reason = 'luminance' \
+                and timestamp >= NOW() - INTERVAL 3 hour;"
+                .format(content.get('minor')))
+            print(query)
+            cursor = mysql.connection.cursor()
+            cursor.execute(query)
+            avg_luminance = cursor.fetchone()[0]
+
+            return { "success": True, "avg_luminance": avg_luminance }
+
 ########################## END OTHER ROUTES ##################################################################
 
 
