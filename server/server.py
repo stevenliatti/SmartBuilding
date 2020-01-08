@@ -201,6 +201,43 @@ def get_beacons():
 
     return { "success": True, "beacons": beacons }
 
+@app.route('/get_devices', strict_slashes=False)
+def get_devices():
+    content = request.args
+    if content:
+        if all(item in content.keys() for item in ['uuid', 'major', 'minor']):
+            query = ("select id, KnxNode.kind from Device join Beacon on \
+                Beacon.room_number = Device.room_number join KnxNode on \
+                KnxNode.device_id = Device.id where minor = {};"
+                .format(content.get('minor')))
+            print(query)
+            cursor = mysql.connection.cursor()
+            cursor.execute(query)
+            knx_db = cursor.fetchall()
+
+            devices = []
+            for device in knx_db:
+                devices.append({
+                    "id": device[0],
+                    "name": device[1],
+                })
+
+            query = ("select id, name from Device join Beacon on \
+                Beacon.room_number = Device.room_number join ZwaveNode on \
+                ZwaveNode.device_id = Device.id where minor = {};"
+                .format(content.get('minor')))
+            print(query)
+            cursor = mysql.connection.cursor()
+            cursor.execute(query)
+            zwave_db = cursor.fetchall()
+
+            for device in zwave_db:
+                devices.append({
+                    "id": device[0],
+                    "name": device[1],
+                })
+
+            return { "success": True, "devices": devices }
 
 ########################## END OTHER ROUTES ##################################################################
 

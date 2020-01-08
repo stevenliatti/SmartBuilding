@@ -3,4 +3,8 @@
     <string name="action_settings">Settings</string>
     <string name="light_on">Light ON</string>
     <string name="open_blind">Open blind</string>
+    <string name="open_radiator">Open radiator</string>
+    <string name="light_off">Light OFF</string>
+    <string name="close_blind">Close blind</string>
+    <string name="close_radiator">Close radiator</string>
 </resources>
