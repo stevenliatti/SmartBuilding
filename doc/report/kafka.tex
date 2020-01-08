@@ -18,4 +18,9 @@ Kafka offre quatre \acrshort{api}s principales :
 
 \subsection{Usage dans le projet}
 Dans le cadre de ce projet, nous avons utilisé Kafka afin de communiquer entre les différentes entités de l'application.
-Chacunes d'entre elles (KNX, OpenZWave, \acrshort{api} rest Flask) écoute et produit différents messages dans Kafka afin de réagir à certaines actions provenant du client et également de produire des informations à intervalles réguliers, sans dépendre de la demande des client. Au sein de ce projet, nous faisons usage de deux topics principaux "KNX" et "Zwave" qui permettent aux différents services d'émettre et récéptionner les messages qui les concernent.
+Chacunes d'entre elles (KNX, OpenZWave, \acrshort{api} \acrshort{rest} Flask, DB translator et Automatic Controller) écoute et produit différents messages dans Kafka afin de réagir à certaines actions provenant du client et également de produire des informations à intervalles réguliers, sans dépendre de la demande des client. Au sein de ce projet, nous faisons usage de trois topics : 
+\begin{enumerate}
+    \item \mintinline{text}{knx} : concerne toutes les commandes KNX.
+    \item \mintinline{text}{zwave} : concerne toutes les commandes OpenZWave.
+    \item \mintinline{text}{db} : pour la production de la liste des devices présents en base de données.
+\end{enumerate}
