@@ -45,30 +45,30 @@ class logs:
 
             if message.topic == KNX_TOPIC:
                 kind, bloc, floor, reason, value = self.decode_knx_infos(content)
-                query = ("SELECT device_id FROM KnxNode WHERE KnxNode.kind = 'blind' \
-                        AND bloc = {} and floor = {};".format(bloc, floor))
-                self.cursor.execute(query)
-                device_id = self.cursor.fetchone()[0]
+                if kind and bloc and floor and reason and value:
+                    query = ("SELECT device_id FROM KnxNode WHERE KnxNode.kind = 'blind' \
+                            AND bloc = {} and floor = {};".format(bloc, floor))
+                    self.cursor.execute(query)
+                    device_id = self.cursor.fetchone()[0]
 
-                query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
-                        VALUES (NOW(), {}, \"{}\", {});"
-                        .format(value, reason, device_id))
-                self.cursor.execute(query)
-                self.cnx.commit()
+                    query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
+                            VALUES (NOW(), {}, \"{}\", {});"
+                            .format(value, reason, device_id))
+                    self.cursor.execute(query)
+                    self.cnx.commit()
             elif message.topic == OPENZWAVE_TOPIC:
                 node_id, reason, value = self.decode_openzwave_infos(content)
-                query = ("SELECT device_id FROM ZwaveNode WHERE node_id = {};"
-                        .format(node_id))
-                self.cursor.execute(query)
-                device_id = self.cursor.fetchone()[0]
+                if node_id and reason and value:
+                    query = ("SELECT device_id FROM ZwaveNode WHERE node_id = {};"
+                            .format(node_id))
+                    self.cursor.execute(query)
+                    device_id = self.cursor.fetchone()[0]
 
-                query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
-                        VALUES (NOW(), {}, \"{}\", {});"
-                        .format(value, reason, device_id))
-                self.cursor.execute(query)
-                self.cnx.commit()
-            else:
-                pass
+                    query = ("INSERT INTO Log (timestamp, value, reason, device_id) \
+                            VALUES (NOW(), {}, \"{}\", {});"
+                            .format(value, reason, device_id))
+                    self.cursor.execute(query)
+                    self.cnx.commit()
 
         self.cursor.close()
         self.cnx.close()

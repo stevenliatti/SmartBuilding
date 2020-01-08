@@ -47,7 +47,7 @@ class producerThread (threading.Thread):
                     }
                     self.produce(json.dumps(kafka_message))
                     time.sleep(1)
-            time.sleep(5)
+            time.sleep(30)
 
 class consumerThread (threading.Thread):
     def __init__(self, consumer):
@@ -93,6 +93,7 @@ class consumerThread (threading.Thread):
                     knx.send_datas(group_address, percent, 2, 2)
                 else:
                     print("Error key")
+                    print(bloc, floor, percent)
 
             elif message.key.decode("utf-8") == "percentage_radiator":
                 bloc, floor, percent = self.decode_knx_infos(message.value.decode("utf-8"))
@@ -101,6 +102,7 @@ class consumerThread (threading.Thread):
                     knx.send_datas(group_address, percent, 2, 2)
                 else:
                     print("Error key")
+                    print(bloc, floor, percent)
 
 
 

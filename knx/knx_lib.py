@@ -25,8 +25,8 @@ class knx:
         self.sock.sendto(object_frame, (self.gateway_ip, self.gateway_port))
         data_recv, addr = self.sock.recvfrom(1024)
         conn_resp_object = knxnet.decode_frame(data_recv)
-        print(type(conn_resp_object))
-        print(conn_resp_object)
+        # print(type(conn_resp_object))
+        # print(conn_resp_object)
         return conn_resp_object
 
     def create_connexion(self):
