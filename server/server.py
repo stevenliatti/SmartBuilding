@@ -180,6 +180,31 @@ def percentage_dimmers():
 
 ########################## END OPENZWAVE ROUTES ##################################################################
 
+########################## OTHER ROUTES ######################################################################
+
+@app.route('/get_beacons', strict_slashes=False)
+def get_beacons():
+    query = "SELECT * FROM Beacon;"
+    print(query)
+    cursor = mysql.connection.cursor()
+    cursor.execute(query)
+    beacons_db = cursor.fetchall()
+
+    beacons = []
+    for beacon in beacons_db:
+        beacons.append({
+            "uuid": beacon[0],
+            "major": beacon[1],
+            "minor": beacon[2],
+            "room_number": beacon[3]
+        })
+
+    return { "success": True, "beacons": beacons }
+
+
+########################## END OTHER ROUTES ##################################################################
+
+
 from logging import FileHandler, Formatter, DEBUG
 
 if __name__ == '__main__':
