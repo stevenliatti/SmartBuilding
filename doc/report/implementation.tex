@@ -1,6 +1,6 @@
 \subsection{Application client}
-Le client developpé est une application Android. Nous avons choisi d'utiliser le langage Kotlin qui est plus performant et optimise les opérations et la structure par rapport à Java. C'est également le langage que nous utilisons au sein du cours d'Android, c'est donc un bon moyen de mettre en relation les deux cours.
-Le rôle principal de ce client est de détecter (grâce au bluetooth) le Beacon le plus proche. En fonction de ce Beacon, le serveur Flask \acrshort{rest} est interrogé pour déterminer (via la base de données) dans quelle salle se trouve la personne et les \textit{\textit{devices}} présents (stores, radiateurs, lumières, etc.). Une fois l'emplacement déterminé et les \textit{\textit{devices}} détectés, les contrôles et les informations des différents \textit{\textit{devices}} apparaissent sur l'interface graphique de l'utilisateur, lui permettant de contrôler ou obtenir les différentes informations actuelles des \textit{\textit{devices}} et passées (sur les trois dernières heures) à proximité. La figure \ref{app_android} illustre le résultat obtenu.
+Le client développé est une application Android. Nous avons choisi d'utiliser le langage Kotlin qui est plus performant et optimise les opérations et la structure par rapport à Java. C'est également le langage que nous utilisons au sein du cours d'Android, c'est donc un bon moyen de mettre en relation les deux cours.
+Le rôle principal de ce client est de détecter (grâce au bluetooth) le Beacon le plus proche. En fonction de ce Beacon, le serveur Flask \acrshort{rest} est interrogé pour déterminer (via la base de données) dans quelle salle se trouve la personne et les \textit{\textit{devices}} présents (stores, radiateurs, lumières, etc.). Une fois l'emplacement déterminé et les \textit{\textit{devices}} détectés, les contrôles et les informations des différents \textit{\textit{devices}} apparaissent sur l'interface graphique de l'utilisateur, lui permettant de contrôler ou obtenir les différentes informations actuelles et passées des \textit{\textit{devices}} (sur les trois dernières heures) à proximité. La figure \ref{app_android} illustre le résultat obtenu.
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.35\textwidth]{img/app.png}
@@ -10,7 +10,7 @@ Le rôle principal de ce client est de détecter (grâce au bluetooth) le Beacon
 \end{figure}
 
 \subsection{Broker Kafka}
-Le broker Kafka joue le rôle de coordinateur entre tous les différents clients qui consomment et produisent des messages dans les différents topics. Nous avons choisi de déployer ce broker Kafka sur une instance AWS \cite{aws} avec Docker \cite{docker} et docker-compose \cite{docker-compose}, le rendant accessible par toutes les entités du système.
+Le broker Kafka joue le rôle de coordinateur entre les différents clients qui consomment et produisent des messages dans les différents topics. Nous avons choisi de déployer ce broker Kafka sur une instance AWS \cite{aws} avec Docker \cite{docker} et docker-compose \cite{docker-compose}, le rendant accessible par toutes les entités du système.
 Nous avons également associé un nom de domaine à cette instance, ce qui permet de la référencer de manière plus lisible et agréable par les clients. Nous avons fait usage des images docker de Confluent \cite{confluent} pour Kafka \cite{cp-kafka} et son Zookeeper \cite{cp-zookeeper}. Elles intègrent un broker Kafka configurable. Le listing \ref{compose-kafka} montre un exemple d'utilisation de ces images dans un \mintinline{text}{docker-compose.yml}. Dans cet exemple, le broker Kafka utilisé est disponible avec l'\acrshort{uri} \mintinline{text}{iot.liatti.ch} sur le port 29092.
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{yaml}
@@ -41,7 +41,7 @@ services:
 
 \subsection{\acrshort{rest} server Flask}
 Etant donné qu'il n'existe pas encore de librairie permettant d'utiliser directement le client Kafka sur Android, nous avons du mettre en place un adapteur entre Kafka et Android.
-Pour ce faire, nous avons utilisé la librairie Flask \cite{flask} de Python 3 qui permet de mettre en place une \acrshort{api} \acrshort{rest}. Ce serveur est connecté à la base de données et au broker Kafka. Le producteur Kafka se charge de transformer les actions reçues sous forme de requêtes HTTP en messages Kafka envoyés directement dans le bon topic, ce qui permet d'effectuer les actions demandées en conséquence (ouverture des stores par exemple). Pour récupérer l'état actuel des \textit{\textit{devices}} ou de la pièce, les derniers logs sont récupérés avec des requêtes à la base de données. Le serveur est déployé dans un container Docker avec docker-compose.
+Pour ce faire, nous avons utilisé la librairie Flask \cite{flask} de Python 3 qui permet fournit une \acrshort{api} \acrshort{rest}. Ce serveur est connecté à la base de données et au broker Kafka. Le producteur Kafka se charge de transformer les actions reçues sous forme de requêtes HTTP en messages Kafka envoyés directement dans le bon topic, ce qui permet d'effectuer les actions demandées en conséquence (ouverture des stores par exemple). Pour récupérer l'état actuel des \textit{\textit{devices}} ou de la pièce, les derniers logs sont récupérés avec des requêtes à la base de données. Le serveur est déployé dans un container Docker avec docker-compose.
 
 \subsubsection{Routes exposées}
 Voici la liste exhaustive des différentes routes mise à disposition par notre \acrshort{api} \acrshort{rest} : 
@@ -375,6 +375,7 @@ L'étage et la chambre permettent d'identifier l'appareil sur lequel il faut agi
 \subsubsection{Openzwave}
 Openzwave est capable de traiter les messages suivants : 
 \paragraph{Production}
+Les messages suivants sont produits à intervalles de 5 secondes.
 \begin{itemize}
     \item \mintinline{text}{sensors_get_temperature} : produit la valeur de température de chaque senseur
     \item \mintinline{text}{sensors_get_humidity} : produit la valeur de l'humidité de chaque senseur
@@ -389,11 +390,11 @@ Openzwave est capable de traiter les messages suivants :
 \end{itemize}
 
 \subsection{Base de données}
-En ce qui concerne la base de données, nous avons opté pour une base relationnelle avec MySQL \cite{mysql} qui nous a permis de représenter les différentes entités et les lier facilement et de manière efficace. Comme représenté sur la figure \ref{db_schema}, la base comporte six tables :
+En ce qui concerne la base de données, nous avons opté pour une base relationnelle avec MySQL \cite{mysql} qui nous a permis de représenter les différentes entités de manière efficace. Comme représenté sur la figure \ref{db_schema}, la base comporte six tables :
 \begin{itemize}
     \item \mintinline{text}{Beacon} : contient tous les Beacons et dans quelle pièce
-    \item \mintinline{text}{Room} : contient les différentes pièces et à quel étage
-    \item \mintinline{text}{Device} : contient tous les \textit{devices} (KNX et Openzwave), identifiés de manière unique et dans quelle pièce ils se trouvent
+    \item \mintinline{text}{Room} : contient les différentes pièces et leur étage
+    \item \mintinline{text}{Device} : contient tous les \textit{devices} (KNX et Openzwave), identifiés de manière unique et leur pièce respective
     \item \mintinline{text}{KnxNode} : contient les informations concernant les \textit{devices} KNX uniquement (type, bloc et étage)
     \item \mintinline{text}{ZwaveNode} : contient les informations concernant les \textit{devices} Openzwave uniquement (identifiant dans le réseau Openzwave et nom)
     \item \mintinline{text}{Log} : contient les logs produits par tous les \textit{devices} avec la valeur, le type de valeur et le \textit{timestamp} (à la seconde) de la mesure
@@ -405,7 +406,6 @@ Ces relations permettent des usages tels que :
     \item Réaliser des statistiques sur les logs, comme la température moyenne dans une pièce
 \end{itemize}
 
-Voici le diagramme représentant notre base de données :
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.8\textwidth]{img/mysql-shema.png}
@@ -415,7 +415,7 @@ Voici le diagramme représentant notre base de données :
 \end{figure}
 
 \subsection{Automatic controller}
-Le contrôleur automatique est déployé dans un container Docker avec docker-compose. Son rôle est de gérer les états des \textit{devices} dans les différentes salles. Pour ce faire, il lit les messages dans les topics Kafka propres à KNX et Openzwave. En fonction des informations récupérées sur les \textit{devices}, il applique certaines règles logiques afin de contrôler les \textit{devices} automatiquement.
+Le contrôleur automatique est déployé dans un container Docker avec docker-compose. Son rôle est de gérer les états des \textit{devices} dans les différentes salles. Pour ce faire, il lit les messages dans les topics Kafka propres à KNX et Openzwave. En fonction des informations récupérées sur les \textit{devices}, il applique certaines règles logiques afin de les contrôler automatiquement.
 Les différentes règles sont les suivantes (à savoir que les différentes valeurs définies sont arbitraires et modifiables très facilement) :
 \begin{itemize}
   \item Si aucune présence est détectée dans la pièce, le radiateur se met automatiquement à 10\% afin d'économiser de l'énergie

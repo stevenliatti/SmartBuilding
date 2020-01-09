@@ -1,7 +1,7 @@
 La technologie d'échange des messages était au choix, nous avons choisi d'expérimenter Kafka \cite{kafka}, étant donné qu'elle est de plus en plus répandue dans différents projets IoT, il était donc intéressant de la prendre en main au travers de ce projet.
 
 \subsection{Généralités}
-Apache Kafka est une plate-forme de diffusion d'événements distribuée open source, tolérante aux pannes, développée initialement par LinkedIn par l'\textit{Apache Software Foundation}, écrit en Scala. Service de journalisation distribué, Kafka est utilisé en tant que \textit{hub} de messagerie haute performance, en raison de son débit, de son évolutivité, de sa fiabilité et de son mécanisme de réplication. Les messages Kafka peuvent être étiquetés et publiés/consommés dans un "sujet" (ou "\textit{topic}). Chaque message est constitué d'une clé, d'une valeur et d'un \textit{timestamp}. Étant donné que Kafka est un système distribué, les rubriques peuvent être partitionnées et répliquées sur plusieurs noeuds. Les fonctionnalités phare de Kafka sont :
+Apache Kafka est une plate-forme de diffusion d'événements distribuée open source, tolérante aux pannes, développée initialement par LinkedIn puis reprise par l'\textit{Apache Software Foundation}, écrite en Scala. Service de journalisation distribué, Kafka est utilisé en tant que \textit{hub} de messagerie haute performance, en raison de son débit, de son évolutivité, de sa fiabilité et de son mécanisme de réplication. Les messages Kafka peuvent être étiquetés et publiés/consommés dans un "sujet" (ou "\textit{topic}"). Chaque message est constitué d'une clé, d'une valeur et d'un \textit{timestamp}. Étant donné que Kafka est un système distribué, les rubriques peuvent être partitionnées et répliquées sur plusieurs noeuds. Les fonctionnalités phare de Kafka sont :
 \begin{itemize}
     \item Publier et s'abonner à des flux de messages, similaires à une file d'attente de messages ou à un système de messagerie d'entreprise.
     \item Stocker les flux de messages d'une manière durable et tolérante aux pannes.
@@ -12,7 +12,7 @@ Kafka offre quatre \acrshort{api}s principales :
 \begin{itemize}
     \item L'\acrshort{api} \textit{Producer} permet à une application de publier un flux de messages sur un ou plusieurs \textit{topics} Kafka.
     \item L'\acrshort{api} \textit{Consumer} permet à une application de s'abonner à un ou plusieurs \textit{topics} et de traiter le flux de messages produit.
-    \item L'\acrshort{api} \textit{Streams} consommant un flux de messages à partir d'un ou plusieurs \textit{topics}, en leur appliquant un traitement, puis les reproduire dans un ou plusieurs \textit{topics}.
+    \item L'\acrshort{api} \textit{Streams} consommant un flux de messages à partir d'un ou plusieurs \textit{topics}, en leur appliquant un traitement, puis les reproduisant dans un ou plusieurs \textit{topics}.
     \item L'\acrshort{api} \textit{Connector} permet de construire des producteurs ou consommateurs Kafka réutilisables et connectés à des applications existantes. Par exemple un connecteur à une base de données qui capture tout changement dans celle-ci.
 \end{itemize}
 
@@ -22,5 +22,5 @@ Chacunes d'entre elles (KNX, OpenZWave, \acrshort{api} \acrshort{rest} Flask, DB
 \begin{enumerate}
     \item \mintinline{text}{knx} : concerne toutes les commandes KNX.
     \item \mintinline{text}{zwave} : concerne toutes les commandes OpenZWave.
-    \item \mintinline{text}{db} : pour la production de la liste des devices présents en base de données.
+    \item \mintinline{text}{db} : pour la production de la liste des \textit{devices} présents en base de données.
 \end{enumerate}
