@@ -45,7 +45,6 @@ Pour ce faire, nous avons utilisé la librairie Flask \cite{flask} de Python 3 q
 
 \subsubsection{Routes exposées}
 Voici la liste exhaustive des différentes routes mise à disposition par notre \acrshort{api} \acrshort{rest} : 
-% TODO: prendre les routes et bien formatter
 
 \paragraph{KNX}
 
@@ -415,8 +414,16 @@ Voici le diagramme représentant notre base de données :
     \label{db_schema}
 \end{figure}
 
-% TODO:
 \subsection{Automatic controller}
+Le controleur automatique est déployé dans un container Docker avec docker-compose. Son rôle est de gérer les états des devices dans les différentes salles. Pour ce faire, il lit les messages dans les topics Kafka propres à KNX et Openzwave. En fonction des informations récuprées sur les devices, il applique certaines règlès logiques afin de contrôler les devices automatiquement.
+Les différentes règles sont les suivants : (A savoir que les différentes valeurs définies sont arbitraires et modifiable très facilement)
+\begin{itemize}
+  \item Si aucune présence est detectée dans la pièce, le radiateur se met automatiquement à 10\% afin d'économiser de l'énergie
+  \item Si quelqu'un est dans la pièce, le radiateur se règle à 90\% afin qu'il n'ai pas froid
+  \item Si l'humidité est supérieure à 50\% les stores de la pièce se ferment
+  \item Si il est plus tôt que 19 heure, que quelqu'un est présent dans la pièce et que la lumonosité est faible, les stores s'ouvrent automatiquement
+  \item Si l'heure actuelle est comprise entre 19 heure et 7 heure du matin et que quelqu'un est présent dans la pièce, ou, si la luminosité est trop faible, la lumière s'allume alors automatiquement. Dans un des cas contraires, la lumière s'éteint.
+\end{itemize}
 L'Automatic controller est déployé dans un container Docker avec docker-compose.
 
 \subsection{DB to Kafka}
