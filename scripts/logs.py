@@ -2,7 +2,13 @@
 
 import sys
 import time
+
 import os
+from dotenv import load_dotenv
+load_dotenv()
+from pathlib import Path
+env_path = Path('..') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 import json
 from kafka import KafkaConsumer
@@ -11,7 +17,7 @@ import mysql.connector
 class logs:
     def __init__(self, consumer):
         self.consumer = consumer
-        self.cnx = mysql.connector.connect(user='user', password='iot', host='db', database='iot')
+        self.cnx = mysql.connector.connect(user=os.getenv('MYSQL_USER'), password=os.getenv('MYSQL_PASSWORD'), host=os.getenv('MYSQL_HOST'), database=os.getenv('MYSQL_DB'))
         self.cursor = self.cnx.cursor()
 
     def decode_knx_infos(self, content):
@@ -75,7 +81,7 @@ class logs:
 
 
 if __name__ == '__main__':
-    consumer = KafkaConsumer(bootstrap_servers=['iot.liatti.ch:29092'])
+    consumer = KafkaConsumer(bootstrap_servers=[os.getenv('IOT_DOMAIN') + ':' + str(os.getenv('IOT_KAFKA_PORT'))])
     KNX_TOPIC = "knx"
     OPENZWAVE_TOPIC = "zwave"
     consumer.subscribe([KNX_TOPIC, OPENZWAVE_TOPIC])

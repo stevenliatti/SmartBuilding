@@ -5,6 +5,7 @@ RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for
 RUN pip install kafka-python
 RUN pip install flask
 RUN pip install flask-mysqldb
+RUN pip install python-dotenv
 
 COPY *.py ./
 

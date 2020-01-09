@@ -9,6 +9,13 @@ from init_devices import init_devices
 
 import knx_lib
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from pathlib import Path
+env_path = Path('..') / '.env'
+load_dotenv(dotenv_path=env_path)
+
 XBLINDS = 1
 XBLINDSPERCENT = 3
 XBLINDSREAD = 4
@@ -108,7 +115,7 @@ class consumerThread (threading.Thread):
 
 if __name__ == "__main__":
     topic = "knx"
-    servers = ['iot.liatti.ch:29092']
+    servers = [os.getenv('IOT_DOMAIN') + ':' + str(os.getenv('IOT_KAFKA_PORT'))]
     producer = KafkaProducer(bootstrap_servers=servers)
     consumer = KafkaConsumer(topic, bootstrap_servers=servers)
     p = producerThread(producer, topic)

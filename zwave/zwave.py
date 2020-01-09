@@ -8,6 +8,13 @@ from init_devices import init_devices
 
 from zwave_lib import Backend_with_dimmers_and_sensors
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from pathlib import Path
+env_path = Path('..') / '.env'
+load_dotenv(dotenv_path=env_path)
+
 backend = Backend_with_dimmers_and_sensors()
 
 class producerThread (threading.Thread):
@@ -81,9 +88,9 @@ class consumerThread (threading.Thread):
 
 if __name__ == "__main__":
     topic = "zwave"
-    servers = 'iot.liatti.ch:29092'
-    producer = KafkaProducer(bootstrap_servers='iot.liatti.ch:29092')
-    consumer = KafkaConsumer(topic, bootstrap_servers='iot.liatti.ch:29092')
+    servers = os.getenv('IOT_DOMAIN') + ':' + str(os.getenv('IOT_KAFKA_PORT'))
+    producer = KafkaProducer(bootstrap_servers=servers)
+    consumer = KafkaConsumer(topic, bootstrap_servers=servers)
     backend.start()
     time.sleep(5)
     p = producerThread(producer, topic)

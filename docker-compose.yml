@@ -2,53 +2,44 @@ version: '3'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+    env_file: .env
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
       - 29092:29092
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://iot.liatti.ch:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    env_file: .env
   consumer:
     build: scripts
     depends_on:
       - kafka
+    env_file: .env
     entrypoint: ["./wait-for-it.sh", "kafka:9092", "--timeout=0", "--", "python", "-u", "consumer.py"]
   db_to_kafka:
     build: scripts
     depends_on:
       - kafka
       - db
+    env_file: .env
     entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=0", "--", "python", "-u", "db_to_kafka.py"]
   automatic:
     build: scripts
     depends_on:
       - db_to_kafka
-    entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=0", "--", "python", "-u", "db_to_kafka.py"]
+    env_file: .env
+    entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=0", "--", "python", "-u", "automatic_controller.py"]
   db:
     image: mysql:8.0
-    ports:
-      - 3306:3306
     depends_on:
       - kafka
     command: --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_DATABASE: iot
-      MYSQL_USER: user
-      MYSQL_PASSWORD: iot
-      MYSQL_ROOT_PASSWORD: iot
+    env_file: .env
     volumes:
       - ./db/dump:/docker-entrypoint-initdb.d
       - ./db/conf:/etc/mysql/conf.d
+      # Decomment to save data in docker volume
+      # - persistent:/var/lib/mysql
   server:
     build: server
     ports:
@@ -56,10 +47,12 @@ services:
     depends_on:
       - kafka
       - db
+    env_file: .env
     entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=0", "--", "python", "-u", "server.py"]
   logs:
     build: scripts
     depends_on:
       - kafka
       - db
+    env_file: .env
     entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=0", "--", "python", "-u", "logs.py"]

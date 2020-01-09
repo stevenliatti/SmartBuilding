@@ -2,9 +2,16 @@
 from kafka import KafkaConsumer
 import json
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from pathlib import Path
+env_path = Path('..') / '.env'
+load_dotenv(dotenv_path=env_path)
+
 class init_devices:
     def __init__(self):
-        self.consumer = KafkaConsumer(auto_offset_reset='earliest', bootstrap_servers=['iot.liatti.ch:29092'])
+        self.consumer = KafkaConsumer(auto_offset_reset='earliest', bootstrap_servers=[os.getenv('IOT_DOMAIN') + ':' + str(os.getenv('IOT_KAFKA_PORT'))])
         self.consumer.subscribe(['db'])
 
     def map_devices(self):

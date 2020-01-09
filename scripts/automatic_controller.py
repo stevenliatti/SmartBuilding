@@ -6,6 +6,13 @@ from time import gmtime, strftime
 import json
 from init_devices import init_devices
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from pathlib import Path
+env_path = Path('..') / '.env'
+load_dotenv(dotenv_path=env_path)
+
 KNX_TOPIC = "knx"
 OPENZWAVE_TOPIC = "zwave"
 
@@ -126,9 +133,8 @@ class automatic_controller:
 
 if __name__ == "__main__":
     print("Wait for DB...")
-    # time.sleep(30)
-    topic = "knx"
-    servers = ['iot.liatti.ch:29092']
+    time.sleep(30)
+    servers = [os.getenv('IOT_DOMAIN') + ':' + str(os.getenv('IOT_KAFKA_PORT'))]
     producer = KafkaProducer(bootstrap_servers=servers)
     consumer = KafkaConsumer(bootstrap_servers=servers)
     consumer.subscribe([KNX_TOPIC, OPENZWAVE_TOPIC])
