@@ -47,6 +47,309 @@ Pour ce faire, nous avons utilisé la librairie Flask \cite{flask} de Python 3 q
 Voici la liste exhaustive des différentes routes mise à disposition par notre \acrshort{api} \acrshort{rest} : 
 % TODO: prendre les routes et bien formatter
 
+\paragraph{KNX}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/open_blinds" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item  OK: `{ success: true }`
+      \item - Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/close_blinds" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item  OK: `{ success: true }`
+      \item - Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/percentage_blinds" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+      \item percentage: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item  OK: `{ success: true }`
+      \item - Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/percentage_radiator" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+      \item percentage: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item  OK: `{ success: true }`
+      \item - Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+
+\paragraph{Infos}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/read_percentage_blinds" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, percentage: 42 }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+
+
+\paragraph{OpenZWave}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/percentage_dimmers" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+      \item percentage: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\paragraph{Infos}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/sensor_get_temperature" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, value: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/sensor_get_humidity" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, value: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/sensor_get_luminance" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, value: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/sensor_get_motion" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, value: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/dimmer_get_level" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, value: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\paragraph{Autres routes}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/get_beacons" -  Method: GET}
+  \begin{itemize}
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, beacons: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/get_devices" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, devices: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\paragraph{Stats}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/avg_temperature" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, avg_temperature: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/avg_humidity" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, avg_humidity: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item \mintinline{python}{Endpoint: "/avg_luminance" -  Method: GET}
+  \begin{itemize} 
+    \item Params :
+    \begin{itemize}
+      \item uuid: string
+      \item major: int
+      \item minor: int
+    \end{itemize}
+
+    \item Response : 
+    \begin{itemize}
+      \item Response OK: `{ success: true, avg_luminance: ... }`
+      \item Error: `{ success: false }`
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+
+
+
 \subsection{Modules KNX et Openzwave}
 En se basant sur le code des exercices KNX et Openzwave réalisés en cours, nous avons créé deux modules reliant d'une part Kafka et KNX et d'autre part Kafka et Openzwave. Ces deux modules ont un fonctionnement similaire, ils sont constitués d'une librairie reprenant les méthodes pour communiquer avec KNX ou Openzwave et exposant les différentes méthodes relatives à l'utilisation des \textit{\textit{devices}}. Ils sont également constitués d'un fichier principal (\mintinline{text}{knx.py} et \mintinline{text}{zwave.py}), chaque fichier démarre un thread producteur Kafka, envoyant à intervalles réguliers les valeurs des stores, des senseurs et \textit{dimmers} Openzwave, et un thread consommateur Kafka, écoutant sur le topic "knx" ou "zwave" les commandes à effectuer sur les \textit{\textit{devices}}.
 
