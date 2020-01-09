@@ -10,7 +10,11 @@ Le rôle principal de ce client est de détecter (grâce au bluetooth) le Beacon
 \end{figure}
 
 \subsection{Broker Kafka}
+<<<<<<< HEAD
 Le broker Kafka joue le rôle de coordinateur entre les différents clients qui consomment et produisent des messages dans les différents topics. Nous avons choisi de déployer ce broker Kafka sur une instance AWS \cite{aws} avec Docker \cite{docker} et docker-compose \cite{docker-compose}, le rendant accessible par toutes les entités du système.
+=======
+Le broker Kafka joue le rôle de coordinateur entre tous les clients qui consomment et produisent des messages dans les différents topics. Nous avons choisi de déployer ce broker Kafka sur une instance AWS \cite{aws} avec Docker \cite{docker} et docker-compose \cite{docker-compose}, le rendant accessible par toutes les entités du système.
+>>>>>>> bd590d95568292c3e7eaa012b6beab3759a83597
 Nous avons également associé un nom de domaine à cette instance, ce qui permet de la référencer de manière plus lisible et agréable par les clients. Nous avons fait usage des images docker de Confluent \cite{confluent} pour Kafka \cite{cp-kafka} et son Zookeeper \cite{cp-zookeeper}. Elles intègrent un broker Kafka configurable. Le listing \ref{compose-kafka} montre un exemple d'utilisation de ces images dans un \mintinline{text}{docker-compose.yml}. Dans cet exemple, le broker Kafka utilisé est disponible avec l'\acrshort{uri} \mintinline{text}{iot.liatti.ch} sur le port 29092.
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{yaml}
