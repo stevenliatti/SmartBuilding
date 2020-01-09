@@ -1,19 +1,19 @@
 % TODO: relire tout le fichier
 \subsection{Bilan personnel}
-Pour conclure, ce projet nous a permit d'apprendre et pratiquer Kafka, une technologie initaliemment inconnue, ce qui fût très instructif. Il nous à également permis d'approfondir les notions vue en cours concernant KNX, Openzwave et la detection des beacons depuis un appareil Android. En ajoutant a tout cela une partie devloppement Android, une base de données SQL et l'utilisation de python. Ce qui fait de ce projet un très bon cas pratique permettant de mettre en lien toutes ces technologies plus interessante les unes que les autres.
+Pour conclure, ce projet nous a permis d'apprendre et pratiquer Kafka, une technologie initialement inconnue pour nous, ce qui fût très instructif. Il nous à également permis d'approfondir les notions vues en cours concernant KNX, Openzwave et la détection des Beacons depuis un appareil Android. En ajoutant à tout cela une partie développement Android, une base de données SQL et l'utilisation de python. Ce projet est un très bon cas pratique mettant en lien toutes ces technologies plus intéressantes les unes que les autres.
 
 \subsection{Problèmes rencontrés}
-Les principales difficultés rencontrées durant le développement de ce projet sont les suivantes :
+Néanmoins, plusieurs difficultés ont été rencontrées durant le développement de ce projet :
 \begin{itemize}
-    \item Toute l'architecture Kafka est deployée dans Docker. Afin de configurer le tout de manière automatique nous avons rencontrés quelque problèmes notamment liés à la sortie standard des containers basés sur l'image "pyton3". En effet, le container n'affiche pas la sortie standard des scripts python dans les logs si une option spécifique n'est pas renseignée dans le \mintinline{text}{docker-compose.yml}.
-    \item En ce qui concerne KNX, la documentation fournie ne correspondait pas parfaitement avec le fonctionnement réel du protocole, notamment au niveau des trames renvoyées après la lecture/écriture des données dans le socket. Ce protocol est également peu pratique lorsqu'on souhaite l'utiliser pour transmettre plusieurs messages consécutifs sans fermer la connexion.
-    \item La procédure d'utilisation fournie pour Openzwave manque d'informations concernant le reset manuel du controller. La documentation officielle manque également de précision pour ceraines méthodes.
+    \item Toute l'architecture Kafka est déployée avec docker-compose. Afin de configurer le tout de manière automatique, nous avons rencontrés quelques problèmes, notamment liés à la sortie standard des containers basés sur l'image python. En effet, le container n'affiche pas la sortie standard des scripts python dans les logs si une option spécifique n'est pas renseignée dans le \mintinline{text}{docker-compose.yml}. Pendant un bon moment nous croyions que le consommateur ne fonctionnait pas, alors que c'était uniquement l'affichage qui était défaillant.
+    \item En ce qui concerne KNX, la documentation fournie ne correspondait pas parfaitement avec le fonctionnement réel du protocole, notamment au niveau des trames renvoyées après la lecture/écriture des données dans le socket. Ce protocole est également peu pratique lorsqu'on souhaite l'utiliser pour transmettre plusieurs messages consécutifs sans fermer la connexion.
+    \item La procédure d'utilisation fournie pour Openzwave manque d'informations concernant le reset manuel du \textit{controller}. La documentation officielle manque également cruellement de précision pour la plupart méthodes.
+    \item De manière générale, l'utilisation de python pour ce genre de système distribué est à notre avis peu pratique, python n'étant pas typé et compilé, toutes les cas ont dus être massivement testés à l'exécution pour être certains que le code marche. De plus, dans un contexte de sérialisation et désérialisation fréquente, il est plus judicieux et pratique de disposer d'une conversion fortement typée des données.
 \end{itemize}
 
-% TODO: améliorations
 \subsection{Améliorations possibles}
 Les améliorations suivantes pourraient être apportées au projet :
 \begin{itemize}
-    \item Gestion des droits des utilisateurs : chaque utilisateur devrait pouvoir s'authentifier dans l'application à l'aide d'un username/password, stockés en base de données. Chaque utilisateur aurait également une liste des salles associées à son profil. Etant donné que l'application détecte la salle à l'aide du beacoin le plus proche, il serrait alors très simple de savoir si un utilisateur dispose des droits nécessaires pour accéder aux fonctionnalités proposées par les devices de la salle ou il se trouve.
-    \item SCHEMA SQL ??
+    \item Gestion des droits des utilisateurs : chaque utilisateur devrait pouvoir s'authentifier dans l'application à l'aide d'un \textit{username/password}, stockés en base de données. Chaque utilisateur aurait également une liste des salles associées à son profil. Etant donné que l'application détecte la salle à l'aide du Beacon le plus proche, il serait alors très simple de savoir si un utilisateur dispose des droits nécessaires pour accéder aux fonctionnalités proposées par les \textit{devices} de la salle ou il se trouve.
+    \item Perfectionnement de l'expérience utilisateur de l'application Android.
 \end{itemize}
