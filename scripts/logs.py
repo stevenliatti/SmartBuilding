@@ -13,7 +13,7 @@ import mysql.connector
 class logs:
     def __init__(self, consumer):
         self.consumer = consumer
-        self.cnx = mysql.connector.connect(user=dotenv.get('MYSQL_USER'), password=dotenv.get('MYSQL_PASSWORD'), host=dotenv.get('MYSQL_HOST'), database=dotenv.get('MYSQL_DB'))
+        self.cnx = mysql.connector.connect(user=dotenv.get('MYSQL_USER'), password=dotenv.get('MYSQL_PASSWORD'), host=dotenv.get('MYSQL_HOST'), database=dotenv.get('MYSQL_DATABASE'))
         self.cursor = self.cnx.cursor()
 
     def decode_knx_infos(self, content):

@@ -4,7 +4,7 @@ run_actuasim: install
 install: knxnet_iot actuasim_iot python
 
 python:
-	pip install kafka-python python-env
+	pip install --user kafka-python python-env
 
 knxnet_iot:
 	sudo apt-get update && sudo apt-get install -y python3-setuptools python3-pyqt5 git
