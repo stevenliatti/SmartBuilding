@@ -5,19 +5,15 @@ import time
 import sys
 import json
 
-import os
-from dotenv import load_dotenv
-load_dotenv()
-from pathlib import Path
-env_path = Path('..') / '.env'
-load_dotenv(dotenv_path=env_path)
+import dotenv
+dotenv.load('../.env')
 
 import mysql.connector
 from kafka import KafkaProducer
 
-producer = KafkaProducer(bootstrap_servers=[os.getenv('IOT_DOMAIN') + ':' + str(os.getenv('IOT_KAFKA_PORT'))])
+producer = KafkaProducer(bootstrap_servers=[dotenv.get('IOT_DOMAIN') + ':' + str(dotenv.get('IOT_KAFKA_PORT'))])
 
-cnx = mysql.connector.connect(user=str(os.getenv('MYSQL_USER')), password=str(os.getenv('MYSQL_PASSWORD')), host=str(os.getenv('MYSQL_HOST')), database=str(os.getenv('MYSQL_DATABASE')))
+cnx = mysql.connector.connect(user=str(dotenv.get('MYSQL_USER')), password=str(dotenv.get('MYSQL_PASSWORD')), host=str(dotenv.get('MYSQL_HOST')), database=str(dotenv.get('MYSQL_DATABASE')))
 cursor = cnx.cursor()
 
 query = "select device_id, room_number, KnxNode.kind, bloc, floor from Device join KnxNode on id = device_id;"

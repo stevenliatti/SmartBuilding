@@ -6,16 +6,12 @@ import sys
 
 from kafka import KafkaProducer
 
-import os
-from dotenv import load_dotenv
-load_dotenv()
-from pathlib import Path
-env_path = Path('..') / '.env'
-load_dotenv(dotenv_path=env_path)
+import dotenv
+dotenv.load('../.env')
 
 print('Listen on stdin ...')
 
-producer = KafkaProducer(bootstrap_servers=[os.getenv('IOT_DOMAIN') + ':' + str(os.getenv('IOT_KAFKA_PORT'))])
+producer = KafkaProducer(bootstrap_servers=[dotenv.get('IOT_DOMAIN') + ':' + str(dotenv.get('IOT_KAFKA_PORT'))])
 
 for line in sys.stdin:
     try:

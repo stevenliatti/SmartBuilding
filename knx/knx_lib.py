@@ -4,19 +4,14 @@
 import socket, sys
 from knxnet import *
 
-import os
-from dotenv import load_dotenv
-load_dotenv()
-from pathlib import Path
-env_path = Path('..') / '.env'
-load_dotenv(dotenv_path=env_path)
-
+import dotenv
+dotenv.load('../.env')
 
 class knx:
     def __init__(self):
-        self.gateway_ip = os.getenv('KNX_GATEWAY')
-        self.gateway_port = os.getenv('KNX_GATEWAY_PORT')
-        self.endpoint_port = os.getenv('KNX_ENDPOINT_PORT')
+        self.gateway_ip = dotenv.get('KNX_GATEWAY')
+        self.gateway_port = dotenv.get('KNX_GATEWAY_PORT')
+        self.endpoint_port = dotenv.get('KNX_ENDPOINT_PORT')
 
         # -> Socket creation
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
