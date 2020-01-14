@@ -162,6 +162,7 @@ INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (10, "knx");
 INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (11, "knx");
 INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (1, "zwave");
 INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (1, "zwave");
+INSERT INTO `iot`.`Device` (`room_number`, `kind`) VALUES (2, "zwave");
 
 INSERT INTO `iot`.`KnxNode` (`kind`, `bloc`, `floor`, `device_id`) VALUES ("radiator", 1, 4, 1);
 INSERT INTO `iot`.`KnxNode` (`kind`, `bloc`, `floor`, `device_id`) VALUES ("radiator", 2, 4, 2);
@@ -174,24 +175,25 @@ INSERT INTO `iot`.`KnxNode` (`kind`, `bloc`, `floor`, `device_id`) VALUES ("blin
 
 INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (2, "Multisensor 6", 9);
 INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (3, "ZE27", 10);
+INSERT INTO `iot`.`ZwaveNode` (`node_id`, `name`, `device_id`) VALUES (4, "ZE27", 11);
 
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 142, "read_percentage_blinds", 5);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 143, "read_percentage_blinds", 5);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 144, "read_percentage_blinds", 5);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 145, "read_percentage_blinds", 5);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 113, "read_percentage_blinds", 6);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 112, "read_percentage_blinds", 6);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 111, "read_percentage_blinds", 6);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 110, "read_percentage_blinds", 6);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 42, "read_percentage_blinds", 5);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 43, "read_percentage_blinds", 5);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 44, "read_percentage_blinds", 5);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 45, "read_percentage_blinds", 5);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 13, "read_percentage_blinds", 6);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 12, "read_percentage_blinds", 6);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 11, "read_percentage_blinds", 6);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 10, "read_percentage_blinds", 6);
 
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 42, "read_percentage_blinds", 7);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 43, "read_percentage_blinds", 7);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 44, "read_percentage_blinds", 7);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 45, "read_percentage_blinds", 7);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 13, "read_percentage_blinds", 8);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 12, "read_percentage_blinds", 8);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 11, "read_percentage_blinds", 8);
-INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 10, "read_percentage_blinds", 8);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 52, "read_percentage_blinds", 7);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 53, "read_percentage_blinds", 7);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 54, "read_percentage_blinds", 7);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 55, "read_percentage_blinds", 7);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 23, "read_percentage_blinds", 8);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 22, "read_percentage_blinds", 8);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 21, "read_percentage_blinds", 8);
+INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 20, "read_percentage_blinds", 8);
 
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 20, "temperature", 9);
 INSERT INTO `iot`.`Log` (`timestamp`, `value`, `reason`, `device_id`) VALUES (NOW(), 21, "temperature", 9);
